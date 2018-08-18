@@ -135,7 +135,18 @@ Implementation of our platform independent renderer class, which performs Metal 
 - (void)writeImageToDisk {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     //NSData* nsData = [NSData dataWithBytes:_backBufferPtr length:_backBuffer.size()];
-    CFDataRef cfDataRef = CFDataCreate(nil, _backBuffer.data(), _backBuffer.size());
+    
+    std::vector<uint8> diskData;
+    diskData.resize(_backBuffer.size());
+    auto* outputPtr = diskData.data();
+    auto rowSize = 4 * _viewportSize.x;
+    
+    for(int j = _viewportSize.y-1; j >= 0; j--) {
+        memcpy(outputPtr, _backBuffer.data() + (j * rowSize), rowSize);
+        outputPtr += rowSize;
+    }
+    
+    CFDataRef cfDataRef = CFDataCreate(nil, diskData.data(), diskData.size());
     CGDataProviderRef provider = CGDataProviderCreateWithCFData(cfDataRef);
     
     CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault | kCGImageAlphaNoneSkipLast;
