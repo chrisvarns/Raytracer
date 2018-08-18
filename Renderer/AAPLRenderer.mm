@@ -4,15 +4,18 @@ See LICENSE folder for this sample’s licensing information.
 Abstract:
 Implementation of our platform independent renderer class, which performs Metal setup and per frame rendering
 */
+#import <simd/simd.h>
+#import <MetalKit/MetalKit.h>
 
-@import simd;
-@import MetalKit;
+#include <vector>
 
 #import "AAPLRenderer.h"
 
 // Header shared between C code here, which executes Metal API commands, and .metal files, which
 //   uses these types as inputs to the shaders
 #import "AAPLShaderTypes.h"
+
+#define ARRAYSIZE(x) sizeof(x)/sizeof(x[0])
 
 // Main class performing the rendering
 @implementation AAPLRenderer
@@ -28,6 +31,12 @@ Implementation of our platform independent renderer class, which performs Metal 
 
     // The current size of our view so we can use this in our render pipeline
     vector_uint2 _viewportSize;
+    
+    bool _redrawBackBuffer;
+    
+    std::vector<uint8>  _backBuffer;
+    uint8*              _backBufferPtr;
+    id<MTLTexture>      _backBufferTex;
 }
 
 /// Initialize with the MetalKit view from which we'll obtain our Metal device
@@ -75,6 +84,15 @@ Implementation of our platform independent renderer class, which performs Metal 
     return self;
 }
 
+- (void)createBackBufferTex {
+    _backBuffer.resize(_viewportSize.x * _viewportSize.y * sizeof(uint8) * 4);
+    _backBufferPtr = _backBuffer.data();
+    
+    MTLTextureDescriptor* texDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm width:_viewportSize.x height:_viewportSize.y mipmapped:NO];
+    
+    _backBufferTex = [_device newTextureWithDescriptor:texDesc];
+}
+
 /// Called whenever view changes orientation or is resized
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
 {
@@ -82,6 +100,8 @@ Implementation of our platform independent renderer class, which performs Metal 
     //   values to our vertex shader when we draw
     _viewportSize.x = size.width;
     _viewportSize.y = size.height;
+    [self createBackBufferTex];
+    _redrawBackBuffer = true;
 }
 
 /// Called whenever the view needs to render a frame
@@ -89,11 +109,28 @@ Implementation of our platform independent renderer class, which performs Metal 
 {
     static const AAPLVertex triangleVertices[] =
     {
-        // 2D positions,    RGBA colors
-        { {  250,  -250 }, { 1, 0, 0, 1 } },
-        { { -250,  -250 }, { 0, 1, 0, 1 } },
-        { {    0,   250 }, { 0, 0, 1, 1 } },
+        { {  1,  -1 }, { 1, 0 } },
+        { { -1,  -1 }, { 0, 0 } },
+        { { -1,   1 }, { 0, 1 } },
+        { {  1,  -1 }, { 1, 0 } },
+        { { -1,   1 }, { 0, 1 } },
+        { {  1,   1 }, { 1, 1 } },
     };
+    
+    if(_redrawBackBuffer) {
+        _redrawBackBuffer = false;
+        uint8* outPtr = _backBufferPtr;
+        auto channel = 0;
+        for(int i = 0; i < _viewportSize.x * _viewportSize.y; ++i) {
+            *(outPtr++) = channel == 0 ? 255 : 0;
+            *(outPtr++) = channel == 1 ? 255 : 0;
+            *(outPtr++) = channel == 2 ? 255 : 0;
+            *(outPtr++) = 255;
+            channel = ++channel % 3;
+        }
+        
+        [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
+    }
 
     // Create a new command buffer for each render pass to the current drawable
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
@@ -108,9 +145,6 @@ Implementation of our platform independent renderer class, which performs Metal 
         id<MTLRenderCommandEncoder> renderEncoder =
         [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"MyRenderEncoder";
-
-        // Set the region of the drawable to which we'll draw.
-        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, _viewportSize.x, _viewportSize.y, -1.0, 1.0 }];
 
         [renderEncoder setRenderPipelineState:_pipelineState];
 
@@ -129,20 +163,14 @@ Implementation of our platform independent renderer class, which performs Metal 
         [renderEncoder setVertexBytes:triangleVertices
                                length:sizeof(triangleVertices)
                               atIndex:AAPLVertexInputIndexVertices];
-
-        // You send a pointer to `_viewportSize` and also indicate its size
-        // The `AAPLVertexInputIndexViewportSize` enum value corresponds to the
-        // `viewportSizePointer` argument in the `vertexShader` function because its
-        //  buffer attribute also uses the `AAPLVertexInputIndexViewportSize` enum value
-        //  for its index
-        [renderEncoder setVertexBytes:&_viewportSize
-                               length:sizeof(_viewportSize)
-                              atIndex:AAPLVertexInputIndexViewportSize];
+        
+        [renderEncoder setFragmentTexture:_backBufferTex
+                                  atIndex:0];
 
         // Draw the 3 vertices of our triangle
         [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
                           vertexStart:0
-                          vertexCount:3];
+                          vertexCount:ARRAYSIZE(triangleVertices)];
 
         [renderEncoder endEncoding];
 

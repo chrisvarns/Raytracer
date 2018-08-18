@@ -15,7 +15,6 @@ Header containing types and enum constants shared between Metal shaders and C/Ob
 typedef enum AAPLVertexInputIndex
 {
     AAPLVertexInputIndexVertices     = 0,
-    AAPLVertexInputIndexViewportSize = 1,
 } AAPLVertexInputIndex;
 
 //  This structure defines the layout of each vertex in the array of vertices set as an input to our
@@ -29,7 +28,7 @@ typedef struct
     vector_float2 position;
 
     // Floating-point RGBA colors
-    vector_float4 color;
+    vector_float2 uv;
 } AAPLVertex;
 
 #endif /* AAPLShaderTypes_h */
