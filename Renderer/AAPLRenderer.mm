@@ -6,6 +6,8 @@ Implementation of our platform independent renderer class, which performs Metal 
 */
 #import <simd/simd.h>
 #import <MetalKit/MetalKit.h>
+#import <ImageIO/ImageIO.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 #include <vector>
 
@@ -37,6 +39,8 @@ Implementation of our platform independent renderer class, which performs Metal 
     std::vector<uint8>  _backBuffer;
     uint8*              _backBufferPtr;
     id<MTLTexture>      _backBufferTex;
+    
+    NSString* _outputPath;
 }
 
 /// Initialize with the MetalKit view from which we'll obtain our Metal device
@@ -79,6 +83,9 @@ Implementation of our platform independent renderer class, which performs Metal 
 
         // Create the command queue
         _commandQueue = [_device newCommandQueue];
+        
+        _outputPath = [[NSProcessInfo processInfo] arguments][1];
+        _outputPath = [_outputPath stringByAppendingString:@"/output.png"];
     }
 
     return self;
@@ -118,7 +125,32 @@ Implementation of our platform independent renderer class, which performs Metal 
         }
     }
     
+    [self writeImageToDisk];
+    
     [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
+}
+
+
+
+- (void)writeImageToDisk {
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    //NSData* nsData = [NSData dataWithBytes:_backBufferPtr length:_backBuffer.size()];
+    CFDataRef cfDataRef = CFDataCreate(nil, _backBuffer.data(), _backBuffer.size());
+    CGDataProviderRef provider = CGDataProviderCreateWithCFData(cfDataRef);
+    
+    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault | kCGImageAlphaNoneSkipLast;
+    CGImageRef cgImage = CGImageCreate(_viewportSize.x, _viewportSize.y, 8, 32, 4*_viewportSize.x, colorSpace, bitmapInfo, provider, nil, NO, kCGRenderingIntentDefault);
+    
+    CGColorSpaceRelease(colorSpace);
+    CGDataProviderRelease(provider);
+    
+    NSURL* fileUrl = [NSURL fileURLWithPath:_outputPath];
+    CGImageDestinationRef imageDest = CGImageDestinationCreateWithURL((CFURLRef)fileUrl, kUTTypePNG, 1, nil);
+    CGImageDestinationAddImage(imageDest, cgImage, nil);
+    CGImageDestinationFinalize(imageDest);
+    
+    CGImageRelease(cgImage);
+    CFRelease(imageDest);
 }
 
 /// Called whenever the view needs to render a frame
