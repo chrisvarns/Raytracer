@@ -104,6 +104,23 @@ Implementation of our platform independent renderer class, which performs Metal 
     _redrawBackBuffer = true;
 }
 
+- (void)redrawBackBuffer {
+    uint8* outPtr = _backBufferPtr;
+    for(auto j = 0; j < _viewportSize.y; j++) {
+        for(auto i = 0; i < _viewportSize.x; i++) {
+            float r = float(i) / _viewportSize.x;
+            float g = float(j) / _viewportSize.y;
+            float b = 0.2f;
+            *(outPtr++) = uint8(255.99 * r);
+            *(outPtr++) = uint8(255.99 * g);
+            *(outPtr++) = uint8(255.99 * b);
+            *(outPtr++) = 255;
+        }
+    }
+    
+    [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
+}
+
 /// Called whenever the view needs to render a frame
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
@@ -119,17 +136,7 @@ Implementation of our platform independent renderer class, which performs Metal 
     
     if(_redrawBackBuffer) {
         _redrawBackBuffer = false;
-        uint8* outPtr = _backBufferPtr;
-        auto channel = 0;
-        for(int i = 0; i < _viewportSize.x * _viewportSize.y; ++i) {
-            *(outPtr++) = channel == 0 ? 255 : 0;
-            *(outPtr++) = channel == 1 ? 255 : 0;
-            *(outPtr++) = channel == 2 ? 255 : 0;
-            *(outPtr++) = 255;
-            channel = ++channel % 3;
-        }
-        
-        [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
+        [self redrawBackBuffer];
     }
 
     // Create a new command buffer for each render pass to the current drawable
