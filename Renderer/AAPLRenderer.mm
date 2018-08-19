@@ -11,6 +11,9 @@ Implementation of our platform independent renderer class, which performs Metal 
 
 #include <vector>
 
+#include "glm/glm.hpp"
+using namespace glm;
+
 #import "AAPLRenderer.h"
 #import "AAPLShaderTypes.h"
 
@@ -108,16 +111,39 @@ Implementation of our platform independent renderer class, which performs Metal 
     _redrawBackBuffer = true;
 }
 
+struct ray {
+    ray() {}
+    ray(const vec3& a, const vec3& b) { this->a = a; this->b = b; }
+    
+    vec3 origin() const { return a; }
+    vec3 direction() const { return b; }
+    vec3 point_at_parameter(float t) const { return a + b * t; }
+    
+    vec3 a, b;
+};
+
+vec3 color(const ray& r) {
+    vec3 unit_direction = normalize(r.direction());
+    float t = 0.5 * (unit_direction.y + 1);
+    return (1-t)*vec3(1) + t*vec3(0.5, 0.7, 1.0);
+}
+
 - (void)redrawBackBuffer {
+    
+    vec3 lower_left_corner(-2, -1, -1);
+    vec3 horizontal(4, 0, 0);
+    vec3 vertical(0, 2, 0);
+    vec3 origin(0);
     uint8* outPtr = _backBufferPtr;
     for(auto j = 0; j < _viewportSize.y; j++) {
         for(auto i = 0; i < _viewportSize.x; i++) {
-            float r = float(i) / _viewportSize.x;
-            float g = float(j) / _viewportSize.y;
-            float b = 0.2f;
-            *(outPtr++) = uint8(255.99 * r);
-            *(outPtr++) = uint8(255.99 * g);
-            *(outPtr++) = uint8(255.99 * b);
+            float u = float(i) / _viewportSize.x;
+            float v = float(j) / _viewportSize.y;
+            ray r(origin, lower_left_corner + u*horizontal + v*vertical);
+            vec3 col = color(r);
+            *(outPtr++) = uint8(255.99 * col.r);
+            *(outPtr++) = uint8(255.99 * col.g);
+            *(outPtr++) = uint8(255.99 * col.b);
             *(outPtr++) = 255;
         }
     }
