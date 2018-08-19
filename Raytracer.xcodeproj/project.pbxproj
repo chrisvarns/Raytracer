@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D276BB621297458006ACD11 /* raytracer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BB421297458006ACD11 /* raytracer.cpp */; };
 		3A05CBE01F731ABB00CA21B1 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A1F1B411F0338CF001622B3 /* MetalKit.framework */; };
 		3A05CBE11F731AC000CA21B1 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A05CBDE1F731AB800CA21B1 /* MetalKit.framework */; };
 		3A1F1B391F033765001622B3 /* AAPLViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A35329C1E99974500C194AD /* AAPLViewController.m */; };
@@ -31,6 +32,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D276BB421297458006ACD11 /* raytracer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = raytracer.cpp; sourceTree = "<group>"; };
+		0D276BB521297458006ACD11 /* raytracer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raytracer.h; sourceTree = "<group>"; };
+		0D276BB82129757B006ACD11 /* ray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ray.h; sourceTree = "<group>"; };
+		0D276BB921297719006ACD11 /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		3A05CBDE1F731AB800CA21B1 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = ../../../../iPhoneOS.platform/Developer/SDKs/iPhoneOS11.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		3A1F1B401F0338C6001622B3 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		3A1F1B411F0338CF001622B3 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = ../../../../AppleTVOS.platform/Developer/SDKs/AppleTVOS11.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
@@ -83,6 +88,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0D276BB3212973FA006ACD11 /* raytracer */ = {
+			isa = PBXGroup;
+			children = (
+				0D276BB421297458006ACD11 /* raytracer.cpp */,
+				0D276BB521297458006ACD11 /* raytracer.h */,
+				0D276BB82129757B006ACD11 /* ray.h */,
+				0D276BB921297719006ACD11 /* types.h */,
+			);
+			path = raytracer;
+			sourceTree = "<group>";
+		};
 		3A1F1B351F0336A8001622B3 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -114,6 +130,7 @@
 		3A35327E1E99974500C194AD = {
 			isa = PBXGroup;
 			children = (
+				0D276BB3212973FA006ACD11 /* raytracer */,
 				3A3532831E99974500C194AD /* Renderer */,
 				3A3532911E99974500C194AD /* Application */,
 				3AE289861EEA0A9100DF4C9A /* Frameworks */,
@@ -325,6 +342,7 @@
 				3A1F1B3D1F033827001622B3 /* AAPLViewController.m in Sources */,
 				63E77A1A1ED205A200E1E542 /* AAPLShaders.metal in Sources */,
 				3A1F1B3E1F033846001622B3 /* main.m in Sources */,
+				0D276BB621297458006ACD11 /* raytracer.cpp in Sources */,
 				3A3532D01E99974500C194AD /* AAPLRenderer.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -11,6 +11,7 @@ Implementation of our platform independent renderer class, which performs Metal 
 
 #include <vector>
 
+#include "raytracer.h"
 #include "glm/glm.hpp"
 using namespace glm;
 
@@ -111,61 +112,6 @@ using namespace glm;
     _redrawBackBuffer = true;
 }
 
-struct ray {
-    ray() {}
-    ray(const vec3& a, const vec3& b) { this->a = a; this->b = b; }
-    
-    vec3 origin() const { return a; }
-    vec3 direction() const { return b; }
-    vec3 point_at_parameter(float t) const { return a + b * t; }
-    
-    vec3 a, b;
-};
-
-float hit_sphere(const vec3& center, float radius, const ray& r) {
-    vec3 oc = r.origin() - center;
-    float a = dot(r.direction(), r.direction());
-    float b = 2.0 * dot(oc, r.direction());
-    float c = dot(oc, oc) - radius*radius;
-    float discriminant = b*b - 4*a*c;
-    if(discriminant < 0)
-        return -1;
-    return (-b - sqrt(discriminant)) / (2*a);
-}
-
-vec3 color(const ray& r) {
-    float t = hit_sphere(vec3(0,0,-1), 0.5, r);
-    if(t > 0.0)
-    {
-        vec3 N = normalize(r.point_at_parameter(t) - vec3(0,0,-1));
-        return vec3(0.5)*(N+vec3(1));
-    }
-    vec3 unit_direction = normalize(r.direction());
-    t = 0.5 * (unit_direction.y + 1);
-    return (1-t)*vec3(1) + t*vec3(0.5, 0.7, 1.0);
-}
-
-- (void)redrawBackBuffer {
-    
-    vec3 lower_left_corner(-2, -1, -1);
-    vec3 horizontal(4, 0, 0);
-    vec3 vertical(0, 2, 0);
-    vec3 origin(0);
-    uint8* outPtr = _backBufferPtr;
-    for(auto j = 0; j < _viewportSize.y; j++) {
-        for(auto i = 0; i < _viewportSize.x; i++) {
-            float u = float(i) / _viewportSize.x;
-            float v = float(j) / _viewportSize.y;
-            ray r(origin, lower_left_corner + u*horizontal + v*vertical);
-            vec3 col = color(r);
-            *(outPtr++) = uint8(255.99 * col.r);
-            *(outPtr++) = uint8(255.99 * col.g);
-            *(outPtr++) = uint8(255.99 * col.b);
-            *(outPtr++) = 255;
-        }
-    }
-}
-
 - (void)writeImageToDisk {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     //NSData* nsData = [NSData dataWithBytes:_backBufferPtr length:_backBuffer.size()];
@@ -213,7 +159,7 @@ vec3 color(const ray& r) {
     
     if(_redrawBackBuffer) {
         _redrawBackBuffer = false;
-        [self redrawBackBuffer];
+        redraw(_backBufferPtr, _viewportSize.x, _viewportSize.y);
         [self writeImageToDisk];
         [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
     }
