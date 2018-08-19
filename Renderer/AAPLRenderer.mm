@@ -141,6 +141,7 @@ using namespace glm;
     CGImageDestinationFinalize(imageDest);
     
     CGImageRelease(cgImage);
+    CFRelease(cfDataRef);
     CFRelease(imageDest);
 }
 
