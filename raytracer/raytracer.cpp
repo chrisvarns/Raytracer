@@ -32,11 +32,11 @@ void redraw(U8* outPtr, int width, int height) {
 #if DEBUG
     const int ns = 4;
 #else
-    const int ns = 100;
+    const int ns = 20;
 #endif
     
     hitable* list[5];
-    list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)));
+    list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.1, 0.2, 0.5)));
     list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
     list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 1.0));
     list[3] = new sphere(vec3(-1, 0, -1), 0.5, new dielectric(1.5));
