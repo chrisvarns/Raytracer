@@ -2,7 +2,7 @@
 #include "ray.h"
 
 struct camera {
-    camera();
+    camera(float vfov, float aspect);
     ray get_ray(float u, float v);
     
     vec3 origin;
