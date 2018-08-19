@@ -2,6 +2,7 @@
 #include "hitablelist.h"
 #include "material.h"
 #include "materials/lambertian.h"
+#include "materials/metal.h"
 #include "raytracer.h"
 #include "sphere.h"
 #include "glm/gtc/random.hpp"
@@ -33,10 +34,12 @@ void redraw(U8* outPtr, int width, int height) {
     const int ns = 100;
 #endif
     
-    hitable* list[2];
+    hitable* list[4];
     list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)));
     list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
-    hitable* world = new hitable_list(list, 2);
+    list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2)));
+    list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8)));
+    hitable* world = new hitable_list(list, 4);
     camera cam;
     
     for(auto j = 0; j < height; j++) {
