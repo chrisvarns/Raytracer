@@ -12,9 +12,6 @@ Implementation of our platform independent renderer class, which performs Metal 
 #include <vector>
 
 #import "AAPLRenderer.h"
-
-// Header shared between C code here, which executes Metal API commands, and .metal files, which
-//   uses these types as inputs to the shaders
 #import "AAPLShaderTypes.h"
 
 #define ARRAYSIZE(x) sizeof(x)/sizeof(x[0])
@@ -124,13 +121,7 @@ Implementation of our platform independent renderer class, which performs Metal 
             *(outPtr++) = 255;
         }
     }
-    
-    [self writeImageToDisk];
-    
-    [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
 }
-
-
 
 - (void)writeImageToDisk {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -180,6 +171,8 @@ Implementation of our platform independent renderer class, which performs Metal 
     if(_redrawBackBuffer) {
         _redrawBackBuffer = false;
         [self redrawBackBuffer];
+        [self writeImageToDisk];
+        [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
     }
 
     // Create a new command buffer for each render pass to the current drawable
