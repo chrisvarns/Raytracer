@@ -35,9 +35,6 @@ void redraw(U8* outPtr, int width, int height) {
     const int ns = 20;
 #endif
     
-    float R = cos(M_PI/4);
-    
-    
     hitable* list[5];
     list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.1, 0.2, 0.5)));
     list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
