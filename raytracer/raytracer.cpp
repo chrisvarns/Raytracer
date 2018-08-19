@@ -4,6 +4,7 @@
 #include "materials/dielectric.h"
 #include "materials/lambertian.h"
 #include "materials/metal.h"
+#include "movingsphere.h"
 #include "raytracer.h"
 #include "sphere.h"
 #include "glm/gtc/random.hpp"
@@ -13,13 +14,13 @@ hitable* random_scene() {
     hitable** list = new hitable*[n+1];
     list[0] = new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5)));
     int i = 1;
-    for(int a = -11; a < 11; a++) {
-        for(int b = -11; b < 11; b++) {
+    for(int a = -4; a < 4; a++) {
+        for(int b = -4; b < 4; b++) {
             float choose_mat = drand48();
             vec3 center(a+0.9*drand48(),0.2,b+0.9*drand48());
             if(length(center-vec3(4,0.2,0)) > 0.9) {
                 if(choose_mat < 0.8) { // diffuse
-                    list[i++] = new sphere(center, 0.2, new lambertian(vec3(drand48()*drand48(), drand48()*drand48(), drand48()*drand48())));
+                    list[i++] = new movingsphere(center, center+vec3(0, 0.5*drand48(), 0), 0.0, 1.0, 0.2, new lambertian(vec3(drand48()*drand48(), drand48()*drand48(), drand48()*drand48())));
                 }
                 else if (choose_mat < 0.95) { // metal
                     list[i++] = new sphere(center, 0.2, new metal(vec3(0.5*(1+drand48()), 0.5*(1+drand48()), 0.5*(1+drand48())), 0.5*drand48()));
@@ -66,11 +67,11 @@ void redraw(U8* outPtr, int width, int height) {
     
     hitable* world = random_scene();
     
-    vec3 lookfrom(10, 2, 2);
+    vec3 lookfrom(13, 2, 3);
     vec3 lookat(0,0,0);
-    float dist_to_focus = length(lookfrom-lookat);
-    float aperture = 0.2;
-    camera cam(lookfrom, lookat, vec3(0,1,0), 40.0, float(width)/height, aperture, dist_to_focus);
+    float dist_to_focus = 10;
+    float aperture = 0.0;
+    camera cam(lookfrom, lookat, vec3(0,1,0), 20.0, float(width)/height, aperture, dist_to_focus, 0.0, 1.0);
     
     for(auto j = 0; j < height; j++) {
         for(auto i = 0; i < width; i++) {
