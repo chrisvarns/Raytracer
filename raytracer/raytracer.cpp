@@ -43,7 +43,11 @@ void redraw(U8* outPtr, int width, int height) {
     list[4] = new sphere(vec3(-1, 0, -1), -0.45, new dielectric(1.5));
     hitable* world = new hitable_list(list, 5);
     
-    camera cam(vec3(-2,2,1), vec3(0,0,-1), vec3(0,1,0), 60.0, float(width)/height);
+    vec3 lookfrom(3,3,2);
+    vec3 lookat(0,0,-1);
+    float dist_to_focus = length(lookfrom-lookat);
+    float aperture = 2.0;
+    camera cam(lookfrom, lookat, vec3(0,1,0), 20.0, float(width)/height, aperture, dist_to_focus);
     
     for(auto j = 0; j < height; j++) {
         for(auto i = 0; i < width; i++) {
