@@ -10,6 +10,7 @@
 		0D276BB621297458006ACD11 /* raytracer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BB421297458006ACD11 /* raytracer.cpp */; };
 		0D276BBD21297A02006ACD11 /* sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BBC21297A02006ACD11 /* sphere.cpp */; };
 		0D276BC121297B6F006ACD11 /* hitablelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BBF21297B6F006ACD11 /* hitablelist.cpp */; };
+		0D276BC421298061006ACD11 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BC321298061006ACD11 /* camera.cpp */; };
 		3A05CBE01F731ABB00CA21B1 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A1F1B411F0338CF001622B3 /* MetalKit.framework */; };
 		3A05CBE11F731AC000CA21B1 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A05CBDE1F731AB800CA21B1 /* MetalKit.framework */; };
 		3A1F1B391F033765001622B3 /* AAPLViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A35329C1E99974500C194AD /* AAPLViewController.m */; };
@@ -43,6 +44,8 @@
 		0D276BBC21297A02006ACD11 /* sphere.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sphere.cpp; sourceTree = "<group>"; };
 		0D276BBF21297B6F006ACD11 /* hitablelist.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hitablelist.cpp; sourceTree = "<group>"; };
 		0D276BC021297B6F006ACD11 /* hitablelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hitablelist.h; sourceTree = "<group>"; };
+		0D276BC221297FF4006ACD11 /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
+		0D276BC321298061006ACD11 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		3A05CBDE1F731AB800CA21B1 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = ../../../../iPhoneOS.platform/Developer/SDKs/iPhoneOS11.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		3A1F1B401F0338C6001622B3 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		3A1F1B411F0338CF001622B3 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = ../../../../AppleTVOS.platform/Developer/SDKs/AppleTVOS11.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
@@ -98,6 +101,8 @@
 		0D276BB3212973FA006ACD11 /* raytracer */ = {
 			isa = PBXGroup;
 			children = (
+				0D276BC321298061006ACD11 /* camera.cpp */,
+				0D276BC221297FF4006ACD11 /* camera.h */,
 				0D276BBA21297821006ACD11 /* hitable.h */,
 				0D276BBF21297B6F006ACD11 /* hitablelist.cpp */,
 				0D276BC021297B6F006ACD11 /* hitablelist.h */,
@@ -355,6 +360,7 @@
 				3A1F1B3D1F033827001622B3 /* AAPLViewController.m in Sources */,
 				63E77A1A1ED205A200E1E542 /* AAPLShaders.metal in Sources */,
 				3A1F1B3E1F033846001622B3 /* main.m in Sources */,
+				0D276BC421298061006ACD11 /* camera.cpp in Sources */,
 				0D276BC121297B6F006ACD11 /* hitablelist.cpp in Sources */,
 				0D276BB621297458006ACD11 /* raytracer.cpp in Sources */,
 				3A3532D01E99974500C194AD /* AAPLRenderer.mm in Sources */,

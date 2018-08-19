@@ -1,6 +1,7 @@
+#include "camera.h"
+#include "hitablelist.h"
 #include "raytracer.h"
 #include "sphere.h"
-#include "hitablelist.h"
 
 vec3 color(const ray& r, hitable* world) {
     hit_record rec;
@@ -15,22 +16,29 @@ vec3 color(const ray& r, hitable* world) {
 }
 
 void redraw(U8* outPtr, int width, int height) {
-    vec3 lower_left_corner(-2, -1, -1);
-    vec3 horizontal(4, 0, 0);
-    vec3 vertical(0, 2, 0);
-    vec3 origin(0);
+    
+#if DEBUG
+    const int ns = 10;
+#else
+    const int ns = 100;
+#endif
     
     hitable* list[2];
     list[0] = new sphere(vec3(0,0,-1), 0.5);
     list[1] = new sphere(vec3(0, -100.5, -1), 100);
     hitable* world = new hitable_list(list, 2);
+    camera cam;
     
     for(auto j = 0; j < height; j++) {
         for(auto i = 0; i < width; i++) {
-            float u = float(i) / width;
-            float v = float(j) / height;
-            ray r(origin, lower_left_corner + u*horizontal + v*vertical);
-            vec3 col = color(r, world);
+            vec3 col(0);
+            for(int s = 0; s < ns; s++) {
+                float u = float(i + drand48()) / width;
+                float v = float(j + drand48()) / height;
+                ray r = cam.get_ray(u, v);
+                col += color(r, world);
+            }
+            col /= ns;
             *(outPtr++) = U8(255.99 * col.r);
             *(outPtr++) = U8(255.99 * col.g);
             *(outPtr++) = U8(255.99 * col.b);
