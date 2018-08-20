@@ -10,12 +10,12 @@
 #include "glm/gtc/random.hpp"
 
 hitable* random_scene() {
-    int n = 100;
+    int n = 1000;
     hitable** list = new hitable*[n+1];
     list[0] = new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5)));
     int i = 1;
-    for(int a = -4; a < 4; a++) {
-        for(int b = -4; b < 4; b++) {
+    for(int a = -11; a < 11; a++) {
+        for(int b = -11; b < 11; b++) {
             float choose_mat = drand48();
             vec3 center(a+0.9*drand48(),0.2,b+0.9*drand48());
             if(length(center-vec3(4,0.2,0)) > 0.9) {
@@ -34,9 +34,12 @@ hitable* random_scene() {
     list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
     list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
     list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
-    
+
     return new hitable_list(list, i);
 }
+
+vec3 blue(float(186) / float(255), float(205) / float(255), float(247) / float(255));
+vec3 red(float(220) / float(255), float(205) / float(255), float(226) / float(255));
 
 vec3 color(const ray& r, hitable* world, int depth) {
     hit_record rec;
@@ -52,8 +55,8 @@ vec3 color(const ray& r, hitable* world, int depth) {
     }
     else {
         vec3 unit_direction = normalize(r.direction());
-        float t = 0.5 * (unit_direction.y + 1);
-        return (1-t)*vec3(1) + t*vec3(0.5, 0.7, 1.0);
+        float t = 0.5 * (unit_direction.x + 1);
+        return (1-t)*blue + t*red;
     }
 }
 
@@ -62,16 +65,19 @@ void redraw(U8* outPtr, int width, int height) {
 #if DEBUG
     const int ns = 4;
 #else
-    const int ns = 20;
+    const int ns = 100;
 #endif
-    
+
     hitable* world = random_scene();
+
+    blue = blue * blue;
+    red = red * red;
     
-    vec3 lookfrom(13, 2, 3);
-    vec3 lookat(0,0,0);
+    vec3 lookfrom(13,2,3);
+    vec3 lookat(0,0.5,0);
     float dist_to_focus = 10;
-    float aperture = 0.0;
-    camera cam(lookfrom, lookat, vec3(0,1,0), 20.0, float(width)/height, aperture, dist_to_focus, 0.0, 1.0);
+    float aperture = 0.1;
+    camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(width)/height, aperture, dist_to_focus, 0.0, 0.4);
     
     for(auto j = 0; j < height; j++) {
         for(auto i = 0; i < width; i++) {
