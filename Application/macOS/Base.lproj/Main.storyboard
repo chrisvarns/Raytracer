@@ -662,10 +662,10 @@
                     <window key="window" title="Raytracer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="IQv-IB-iLA" userLabel="Raytracer">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="196" y="240" width="1584" height="396"/>
+                        <rect key="contentRect" x="196" y="240" width="800" height="400"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
-                        <value key="minSize" type="size" width="1584" height="396"/>
-                        <value key="maxSize" type="size" width="1584" height="396"/>
+                        <value key="minSize" type="size" width="800" height="400"/>
+                        <value key="maxSize" type="size" width="800" height="400"/>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="c2Y-5V-HmV"/>
                         </connections>

@@ -10,12 +10,12 @@
 #include "glm/gtc/random.hpp"
 
 hitable* random_scene() {
-    int n = 1000;
+    int n = 100;
     hitable** list = new hitable*[n+1];
     list[0] = new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5)));
     int i = 1;
-    for(int a = -11; a < 11; a++) {
-        for(int b = -11; b < 11; b++) {
+    for(int a = -4; a < 4; a++) {
+        for(int b = -4; b < 4; b++) {
             float choose_mat = drand48();
             vec3 center(a+0.9*drand48(),0.2,b+0.9*drand48());
             if(length(center-vec3(4,0.2,0)) > 0.9) {
@@ -65,7 +65,7 @@ void redraw(U8* outPtr, int width, int height) {
 #if DEBUG
     const int ns = 4;
 #else
-    const int ns = 100;
+    const int ns = 20;
 #endif
 
     hitable* world = random_scene();
