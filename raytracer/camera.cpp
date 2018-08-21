@@ -24,6 +24,6 @@ camera::camera(vec3 lookfrom, vec3 lookat, vec3 vup, float vfov, float aspect, f
 ray camera::get_ray(float s, float t) {
     vec2 rd = diskRand(lens_radius);
     vec3 offset = u * rd.x + v*rd.y;
-    float time = time0 + drand48()*(time1-time0);
+    float time = time0 + fastrandF()*(time1-time0);
     return ray(origin + offset, lower_left_corner + s*horizontal + t*vertical - origin - offset, time);
 }

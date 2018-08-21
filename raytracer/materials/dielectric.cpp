@@ -1,4 +1,5 @@
 #include "dielectric.h"
+#include "../rand.h"
 
 float schlick(float cosine, float ref_idx) {
     float r0 = (1-ref_idx) / (1+ref_idx);
@@ -41,7 +42,7 @@ bool dielectric::scatter(const ray& r_in, const hit_record& rec, vec3& attenuati
     else {
         reflect_prob = 1.0;
     }
-    if(drand48() < reflect_prob) {
+    if(fastrandF() < reflect_prob) {
         scattered = ray(rec.p, reflected, r_in.time());
     }
     else {

@@ -1,3 +1,5 @@
+#include <random>
+
 extern unsigned int g_seed;
  
 //Used to seed the generator.
@@ -11,3 +13,5 @@ inline int fastrand()
     g_seed = (214013*g_seed+2531011);
     return (g_seed>>16)&0x7FFF;
 }
+
+float fastrandF();

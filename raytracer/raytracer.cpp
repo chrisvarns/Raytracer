@@ -17,14 +17,14 @@ hitable_list random_scene() {
     list.spheres.push_back(sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
 //    for(int a = -4; a < 4; a++) {
 //        for(int b = -4; b < 4; b++) {
-//            float choose_mat = drand48();
-//            vec3 center(a+0.9*drand48(),0.2,b+0.9*drand48());
+//            float choose_mat = fastrandF();
+//            vec3 center(a+0.9*fastrandF(),0.2,b+0.9*fastrandF());
 //            if(length(center-vec3(4,0.2,0)) > 0.9) {
 //                if(choose_mat < 0.8) { // diffuse
-//                    list[i++] = new movingsphere(center, center+vec3(0, 0.5*drand48(), 0), 0.0, 1.0, 0.2, new lambertian(vec3(drand48()*drand48(), drand48()*drand48(), drand48()*drand48())));
+//                    list[i++] = new movingsphere(center, center+vec3(0, 0.5*fastrandF(), 0), 0.0, 1.0, 0.2, new lambertian(vec3(fastrandF()*fastrandF(), fastrandF()*fastrandF(), fastrandF()*fastrandF())));
 //                }
 //                else if (choose_mat < 0.95) { // metal
-//                    list[i++] = new sphere(center, 0.2, new metal(vec3(0.5*(1+drand48()), 0.5*(1+drand48()), 0.5*(1+drand48())), 0.5*drand48()));
+//                    list[i++] = new sphere(center, 0.2, new metal(vec3(0.5*(1+fastrandF()), 0.5*(1+fastrandF()), 0.5*(1+fastrandF())), 0.5*fastrandF()));
 //                }
 //                else { // glass
 //                    list[i++] = new sphere(center, 0.2, new dielectric(1.5));
@@ -80,7 +80,7 @@ void redraw(U8* outPtr, int width, int height) {
     float aperture = 0.1;
     camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(width)/height, aperture, dist_to_focus, 0.0, 0.4);
 
-#define TIMING 1
+#define TIMING 0
 #if TIMING
     float total_mrays = 0.0f;
     int numIterations = 0;
@@ -96,8 +96,8 @@ void redraw(U8* outPtr, int width, int height) {
             for(auto i = 0; i < width; i++) {
                 vec3 col(0);
                 for(int s = 0; s < ns; s++) {
-                    float u = float(i + drand48()) / width;
-                    float v = float(j + drand48()) / height;
+                    float u = float(i + fastrandF()) / width;
+                    float v = float(j + fastrandF()) / height;
                     ray r = cam.get_ray(u, v);
                     col += color(r, world, 0);
                 }
