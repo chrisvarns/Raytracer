@@ -11,6 +11,7 @@
 		0D276BBD21297A02006ACD11 /* sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BBC21297A02006ACD11 /* sphere.cpp */; };
 		0D276BC121297B6F006ACD11 /* hitablelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BBF21297B6F006ACD11 /* hitablelist.cpp */; };
 		0D276BC421298061006ACD11 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BC321298061006ACD11 /* camera.cpp */; };
+		0D28A59F212C29BE0041483B /* ray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D28A59E212C29BE0041483B /* ray.cpp */; };
 		0D388EFB2129E358005C5BB4 /* dielectric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D388EFA2129E358005C5BB4 /* dielectric.cpp */; };
 		0D388EFE212A0E1A005C5BB4 /* movingsphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D388EFD212A0E1A005C5BB4 /* movingsphere.cpp */; };
 		0D9A45C6212988EF000E90E3 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D9A45C4212988EF000E90E3 /* material.cpp */; };
@@ -51,6 +52,7 @@
 		0D276BC021297B6F006ACD11 /* hitablelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hitablelist.h; sourceTree = "<group>"; };
 		0D276BC221297FF4006ACD11 /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		0D276BC321298061006ACD11 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
+		0D28A59E212C29BE0041483B /* ray.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ray.cpp; sourceTree = "<group>"; };
 		0D388EF92129E358005C5BB4 /* dielectric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dielectric.h; sourceTree = "<group>"; };
 		0D388EFA2129E358005C5BB4 /* dielectric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dielectric.cpp; sourceTree = "<group>"; };
 		0D388EFC212A0E1A005C5BB4 /* movingsphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = movingsphere.h; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				0D276BBC21297A02006ACD11 /* sphere.cpp */,
 				0D276BBB21297874006ACD11 /* sphere.h */,
 				0D276BB921297719006ACD11 /* types.h */,
+				0D28A59E212C29BE0041483B /* ray.cpp */,
 			);
 			path = raytracer;
 			sourceTree = "<group>";
@@ -391,6 +394,7 @@
 			files = (
 				0D276BBD21297A02006ACD11 /* sphere.cpp in Sources */,
 				3A1F1B3D1F033827001622B3 /* AAPLViewController.m in Sources */,
+				0D28A59F212C29BE0041483B /* ray.cpp in Sources */,
 				63E77A1A1ED205A200E1E542 /* AAPLShaders.metal in Sources */,
 				0D9A45C6212988EF000E90E3 /* material.cpp in Sources */,
 				0D9A45CD21298B21000E90E3 /* metal.cpp in Sources */,
