@@ -12,6 +12,7 @@
 		0D276BC121297B6F006ACD11 /* hitablelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BBF21297B6F006ACD11 /* hitablelist.cpp */; };
 		0D276BC421298061006ACD11 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D276BC321298061006ACD11 /* camera.cpp */; };
 		0D28A59F212C29BE0041483B /* ray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D28A59E212C29BE0041483B /* ray.cpp */; };
+		0D28A5A2212C3AE10041483B /* rand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D28A5A1212C3AE10041483B /* rand.cpp */; };
 		0D388EFB2129E358005C5BB4 /* dielectric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D388EFA2129E358005C5BB4 /* dielectric.cpp */; };
 		0D388EFE212A0E1A005C5BB4 /* movingsphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D388EFD212A0E1A005C5BB4 /* movingsphere.cpp */; };
 		0D9A45C6212988EF000E90E3 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D9A45C4212988EF000E90E3 /* material.cpp */; };
@@ -53,6 +54,8 @@
 		0D276BC221297FF4006ACD11 /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		0D276BC321298061006ACD11 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		0D28A59E212C29BE0041483B /* ray.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ray.cpp; sourceTree = "<group>"; };
+		0D28A5A0212C3AE10041483B /* rand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rand.h; sourceTree = "<group>"; };
+		0D28A5A1212C3AE10041483B /* rand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rand.cpp; sourceTree = "<group>"; };
 		0D388EF92129E358005C5BB4 /* dielectric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dielectric.h; sourceTree = "<group>"; };
 		0D388EFA2129E358005C5BB4 /* dielectric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dielectric.cpp; sourceTree = "<group>"; };
 		0D388EFC212A0E1A005C5BB4 /* movingsphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = movingsphere.h; sourceTree = "<group>"; };
@@ -118,6 +121,8 @@
 		0D276BB3212973FA006ACD11 /* raytracer */ = {
 			isa = PBXGroup;
 			children = (
+				0D28A5A1212C3AE10041483B /* rand.cpp */,
+				0D28A5A0212C3AE10041483B /* rand.h */,
 				0D388EFD212A0E1A005C5BB4 /* movingsphere.cpp */,
 				0D388EFC212A0E1A005C5BB4 /* movingsphere.h */,
 				0D9A45C7212989F4000E90E3 /* materials */,
@@ -400,6 +405,7 @@
 				0D9A45CD21298B21000E90E3 /* metal.cpp in Sources */,
 				0D9A45CA212989F4000E90E3 /* lambertian.cpp in Sources */,
 				3A1F1B3E1F033846001622B3 /* main.m in Sources */,
+				0D28A5A2212C3AE10041483B /* rand.cpp in Sources */,
 				0D276BC421298061006ACD11 /* camera.cpp in Sources */,
 				0D276BC121297B6F006ACD11 /* hitablelist.cpp in Sources */,
 				0D276BB621297458006ACD11 /* raytracer.cpp in Sources */,
@@ -495,7 +501,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/external";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/external",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 			};
@@ -543,7 +552,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/external";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/external",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 			};
 			name = Release;

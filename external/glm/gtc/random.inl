@@ -1,6 +1,6 @@
 /// @ref gtc_random
 /// @file glm/gtc/random.inl
-
+#include "raytracer/rand.h"
 #include "../geometric.hpp"
 #include "../exponential.hpp"
 #include "../trigonometric.hpp"
@@ -25,7 +25,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static vec<1, uint8, P> call()
 		{
 			return vec<1, uint8, P>(
-				std::rand() % std::numeric_limits<uint8>::max());
+				fastrand() % std::numeric_limits<uint8>::max());
 		}
 	};
 
@@ -35,8 +35,8 @@ namespace detail
 		GLM_FUNC_QUALIFIER static vec<2, uint8, P> call()
 		{
 			return vec<2, uint8, P>(
-				std::rand() % std::numeric_limits<uint8>::max(),
-				std::rand() % std::numeric_limits<uint8>::max());
+				fastrand() % std::numeric_limits<uint8>::max(),
+				fastrand() % std::numeric_limits<uint8>::max());
 		}
 	};
 
@@ -46,9 +46,9 @@ namespace detail
 		GLM_FUNC_QUALIFIER static vec<3, uint8, P> call()
 		{
 			return vec<3, uint8, P>(
-				std::rand() % std::numeric_limits<uint8>::max(),
-				std::rand() % std::numeric_limits<uint8>::max(),
-				std::rand() % std::numeric_limits<uint8>::max());
+				fastrand() % std::numeric_limits<uint8>::max(),
+				fastrand() % std::numeric_limits<uint8>::max(),
+				fastrand() % std::numeric_limits<uint8>::max());
 		}
 	};
 
@@ -58,10 +58,10 @@ namespace detail
 		GLM_FUNC_QUALIFIER static vec<4, uint8, P> call()
 		{
 			return vec<4, uint8, P>(
-				std::rand() % std::numeric_limits<uint8>::max(),
-				std::rand() % std::numeric_limits<uint8>::max(),
-				std::rand() % std::numeric_limits<uint8>::max(),
-				std::rand() % std::numeric_limits<uint8>::max());
+				fastrand() % std::numeric_limits<uint8>::max(),
+				fastrand() % std::numeric_limits<uint8>::max(),
+				fastrand() % std::numeric_limits<uint8>::max(),
+				fastrand() % std::numeric_limits<uint8>::max());
 		}
 	};
 

@@ -14,7 +14,6 @@
 
 hitable_list random_scene() {
     hitable_list list;
-    int n = 100;
     list.spheres.push_back(sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
 //    for(int a = -4; a < 4; a++) {
 //        for(int b = -4; b < 4; b++) {
