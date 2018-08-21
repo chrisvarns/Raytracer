@@ -82,12 +82,15 @@ void redraw(U8* outPtr, int width, int height) {
     float aperture = 0.1;
     camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(width)/height, aperture, dist_to_focus, 0.0, 0.4);
 
+#define TIMING 1
+#if TIMING
     float total_mrays = 0.0f;
     int numIterations = 0;
     while(true)
     {
         ray::resetRayCount();
         auto start = std::chrono::steady_clock::now();
+#endif
 
         auto* writePtr = outPtr;
 
@@ -109,6 +112,7 @@ void redraw(U8* outPtr, int width, int height) {
             }
         }
 
+#if TIMING
         const float millionth = 1.0e-6f;
         const float billionth = 1.0e-9f;
 
@@ -120,4 +124,5 @@ void redraw(U8* outPtr, int width, int height) {
         numIterations++;
         printf("MRays/s: %.4f\t\tAverage: %.4f\n", mrays, total_mrays / numIterations);
     }
+#endif
 }
