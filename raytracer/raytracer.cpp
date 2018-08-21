@@ -12,11 +12,10 @@
 #include "sphere.h"
 #include "glm/gtc/random.hpp"
 
-hitable* random_scene() {
+hitable_list random_scene() {
+    hitable_list list;
     int n = 100;
-    hitable** list = new hitable*[n+1];
-    list[0] = new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5)));
-    int i = 1;
+    list.spheres.push_back(sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
 //    for(int a = -4; a < 4; a++) {
 //        for(int b = -4; b < 4; b++) {
 //            float choose_mat = drand48();
@@ -34,19 +33,19 @@ hitable* random_scene() {
 //            }
 //        }
 //    }
-    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
-    list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
-    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+    list.spheres.push_back(sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
+    list.spheres.push_back(sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1))));
+    list.spheres.push_back(sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
 
-    return new hitable_list(list, i);
+    return list;
 }
 
 vec3 blue(float(186) / float(255), float(205) / float(255), float(247) / float(255));
 vec3 red(float(220) / float(255), float(205) / float(255), float(226) / float(255));
 
-vec3 color(const ray& r, hitable* world, int depth) {
+vec3 color(const ray& r, hitable& world, int depth) {
     hit_record rec;
-    if(world->hit(r, 0.001, MAXFLOAT, rec)) {
+    if(world.hit(r, 0.001, MAXFLOAT, rec)) {
         ray scattered;
         vec3 attenuation;
         if(depth < 50 && rec.mat->scatter(r, rec, attenuation, scattered)) {
@@ -71,7 +70,7 @@ void redraw(U8* outPtr, int width, int height) {
     const int ns = 20;
 #endif
 
-    hitable* world = random_scene();
+    hitable_list world = random_scene();
 
     blue = blue * blue;
     red = red * red;
