@@ -7,7 +7,8 @@ struct sphere : public hitable {
     sphere() {};
     sphere(vec3 cen, float r, material* mat) : mat(mat), center(cen), radius(r) {}
     
-    virtual bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const;
+    bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
+    bool bounding_box(float t0, float t1, aabb& box) const override;
 
     material* mat;
     vec3 center;

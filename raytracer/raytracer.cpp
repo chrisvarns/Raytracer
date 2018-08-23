@@ -1,6 +1,9 @@
 #include <chrono>
 #include <cstdio>
 
+#include "glm/gtc/random.hpp"
+
+#include "bvh_node.h"
 #include "camera.h"
 #include "hitablelist.h"
 #include "material.h"
@@ -10,34 +13,48 @@
 #include "movingsphere.h"
 #include "raytracer.h"
 #include "sphere.h"
-#include "glm/gtc/random.hpp"
+
+hitable_list basic_scene() {
+    hitable_list list;
+    list.hitables.reserve(1000);
+    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
+    list.hitables.push_back(new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
+    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1))));
+    list.hitables.push_back(new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
+
+    return list;
+}
 
 hitable_list random_scene() {
     hitable_list list;
-    list.spheres.push_back(sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
-//    for(int a = -4; a < 4; a++) {
-//        for(int b = -4; b < 4; b++) {
-    list.spheres.reserve(1000);
-//            float choose_mat = fastrandF();
-//            vec3 center(a+0.9*fastrandF(),0.2,b+0.9*fastrandF());
-//            if(length(center-vec3(4,0.2,0)) > 0.9) {
-//                if(choose_mat < 0.8) { // diffuse
-//                    list[i++] = new movingsphere(center, center+vec3(0, 0.5*fastrandF(), 0), 0.0, 1.0, 0.2, new lambertian(vec3(fastrandF()*fastrandF(), fastrandF()*fastrandF(), fastrandF()*fastrandF())));
-//                }
-//                else if (choose_mat < 0.95) { // metal
-//                    list[i++] = new sphere(center, 0.2, new metal(vec3(0.5*(1+fastrandF()), 0.5*(1+fastrandF()), 0.5*(1+fastrandF())), 0.5*fastrandF()));
-//                }
-//                else { // glass
-//                    list[i++] = new sphere(center, 0.2, new dielectric(1.5));
-//                }
-//            }
-//        }
-//    }
-    list.spheres.push_back(sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
-    list.spheres.push_back(sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1))));
-    list.spheres.push_back(sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
+    list.hitables.reserve(1000);
+    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
+    for(int a = -11; a < 11; a++) {
+        for(int b = -11; b < 11; b++) {
+            float choose_mat = fastrandF();
+            vec3 center(a+0.9*fastrandF(),0.2,b+0.9*fastrandF());
+            if(length(center-vec3(4,0.2,0)) > 0.9) {
+                if(choose_mat < 0.8) { // diffuse
+                    list.hitables.push_back(new movingsphere(center, center+vec3(0, 0.5*fastrandF(), 0), 0.0, 1.0, 0.2, new lambertian(vec3(fastrandF()*fastrandF(), fastrandF()*fastrandF(), fastrandF()*fastrandF()))));
+                }
+                else if (choose_mat < 0.95) { // metal
+                    list.hitables.push_back(new sphere(center, 0.2, new metal(vec3(0.5*(1+fastrandF()), 0.5*(1+fastrandF()), 0.5*(1+fastrandF())), 0.5*fastrandF())));
+                }
+                else { // glass
+                    list.hitables.push_back(new sphere(center, 0.2, new dielectric(1.5)));
+                }
+            }
+        }
+    }
+    list.hitables.push_back(new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
+    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1))));
+    list.hitables.push_back(new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
 
     return list;
+}
+
+bvh_node convertListToBvh(const hitable_list& list, float time0, float time1) {
+    return bvh_node(const_cast<const hitable**>(list.hitables.data()), int(list.hitables.size()), time0, time1);
 }
 
 vec3 blue(float(186) / float(255), float(205) / float(255), float(247) / float(255));
@@ -65,12 +82,10 @@ vec3 color(const ray& r, hitable& world, int depth) {
 void redraw(U8* outPtr, int width, int height) {
     
 #if DEBUG
-    const int ns = 4;
+    const int ns = 2;
 #else
-    const int ns = 20;
+    const int ns = 10;
 #endif
-
-    hitable_list world = random_scene();
 
     blue = blue * blue;
     red = red * red;
@@ -81,15 +96,19 @@ void redraw(U8* outPtr, int width, int height) {
     float aperture = 0.1;
     camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(width)/height, aperture, dist_to_focus, 0.0, 0.4);
 
-#define TIMING 1
-#if TIMING
+    hitable_list list = random_scene();
+    bvh_node world = convertListToBvh(list, cam.time0, cam.time1);
+
     float total_mrays = 0.0f;
     int numIterations = 0;
+
+#define TIMINGLOOP 1
+#if TIMINGLOOP
     while(true)
+#endif
     {
         ray::resetRayCount();
         auto start = std::chrono::steady_clock::now();
-#endif
 
         auto* writePtr = outPtr;
 
@@ -111,7 +130,6 @@ void redraw(U8* outPtr, int width, int height) {
             }
         }
 
-#if TIMING
         const float millionth = 1.0e-6f;
         const float billionth = 1.0e-9f;
 
@@ -123,5 +141,4 @@ void redraw(U8* outPtr, int width, int height) {
         numIterations++;
         printf("MRays/s: %.4f\t\tAverage: %.4f\n", mrays, total_mrays / numIterations);
     }
-#endif
 }

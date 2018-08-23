@@ -15,6 +15,8 @@
 		0D28A5A2212C3AE10041483B /* rand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D28A5A1212C3AE10041483B /* rand.cpp */; };
 		0D28A858212CC8E10041483B /* glm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D28A77A212CC8E10041483B /* glm.cpp */; };
 		0D28A8B3212CC99A0041483B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3A3532CA1E99974500C194AD /* Main.storyboard */; };
+		0D28C953212F5A9D00C582DF /* aabb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D28C951212F5A9D00C582DF /* aabb.cpp */; };
+		0D28C956212F675200C582DF /* bvh_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D28C954212F675200C582DF /* bvh_node.cpp */; };
 		0D388EFB2129E358005C5BB4 /* dielectric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D388EFA2129E358005C5BB4 /* dielectric.cpp */; };
 		0D388EFE212A0E1A005C5BB4 /* movingsphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D388EFD212A0E1A005C5BB4 /* movingsphere.cpp */; };
 		0D9A45C6212988EF000E90E3 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D9A45C4212988EF000E90E3 /* material.cpp */; };
@@ -320,6 +322,10 @@
 		0D28A838212CC8E10041483B /* rotate_normalized_axis.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = rotate_normalized_axis.hpp; sourceTree = "<group>"; };
 		0D28A839212CC8E10041483B /* projection.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = projection.inl; sourceTree = "<group>"; };
 		0D28A83A212CC8E10041483B /* type_aligned.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = type_aligned.hpp; sourceTree = "<group>"; };
+		0D28C951212F5A9D00C582DF /* aabb.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = aabb.cpp; sourceTree = "<group>"; };
+		0D28C952212F5A9D00C582DF /* aabb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aabb.h; sourceTree = "<group>"; };
+		0D28C954212F675200C582DF /* bvh_node.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bvh_node.cpp; sourceTree = "<group>"; };
+		0D28C955212F675200C582DF /* bvh_node.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bvh_node.h; sourceTree = "<group>"; };
 		0D388EF92129E358005C5BB4 /* dielectric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dielectric.h; sourceTree = "<group>"; };
 		0D388EFA2129E358005C5BB4 /* dielectric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dielectric.cpp; sourceTree = "<group>"; };
 		0D388EFC212A0E1A005C5BB4 /* movingsphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = movingsphere.h; sourceTree = "<group>"; };
@@ -404,6 +410,10 @@
 				0D276BBB21297874006ACD11 /* sphere.h */,
 				0D276BB921297719006ACD11 /* types.h */,
 				0D28A59E212C29BE0041483B /* ray.cpp */,
+				0D28C951212F5A9D00C582DF /* aabb.cpp */,
+				0D28C952212F5A9D00C582DF /* aabb.h */,
+				0D28C954212F675200C582DF /* bvh_node.cpp */,
+				0D28C955212F675200C582DF /* bvh_node.h */,
 			);
 			path = raytracer;
 			sourceTree = "<group>";
@@ -980,6 +990,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D28C953212F5A9D00C582DF /* aabb.cpp in Sources */,
 				0D276BBD21297A02006ACD11 /* sphere.cpp in Sources */,
 				3A1F1B3D1F033827001622B3 /* AAPLViewController.m in Sources */,
 				0D28A59F212C29BE0041483B /* ray.cpp in Sources */,
@@ -989,6 +1000,7 @@
 				0D9A45CA212989F4000E90E3 /* lambertian.cpp in Sources */,
 				3A1F1B3E1F033846001622B3 /* main.m in Sources */,
 				0D28A5A2212C3AE10041483B /* rand.cpp in Sources */,
+				0D28C956212F675200C582DF /* bvh_node.cpp in Sources */,
 				0D276BC421298061006ACD11 /* camera.cpp in Sources */,
 				0D28A858212CC8E10041483B /* glm.cpp in Sources */,
 				0D276BC121297B6F006ACD11 /* hitablelist.cpp in Sources */,
