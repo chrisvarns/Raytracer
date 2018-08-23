@@ -17,6 +17,7 @@ hitable_list random_scene() {
     list.spheres.push_back(sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
 //    for(int a = -4; a < 4; a++) {
 //        for(int b = -4; b < 4; b++) {
+    list.spheres.reserve(1000);
 //            float choose_mat = fastrandF();
 //            vec3 center(a+0.9*fastrandF(),0.2,b+0.9*fastrandF());
 //            if(length(center-vec3(4,0.2,0)) > 0.9) {

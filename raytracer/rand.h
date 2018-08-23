@@ -14,4 +14,9 @@ inline int fastrand()
     return (g_seed>>16)&0x7FFF;
 }
 
-float fastrandF();
+extern std::ranlux24_base base;
+extern std::uniform_real_distribution<float> urd;
+
+inline float fastrandF() {
+    return urd(base);
+}
