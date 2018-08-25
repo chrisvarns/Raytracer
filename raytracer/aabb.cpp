@@ -1,11 +1,13 @@
 #include "aabb.h"
 
 bool aabb::hit(const ray &r, float tmin, float tmax) const {
+    auto direction = r.direction();
+    auto origin = r.origin();
     for (int a = 0; a < 3; a++) {
-        float invD = 1.0f / r.direction()[a];
+        float invD = 1.0f / direction[a];
 
-        float t0 = (min[a] - r.origin()[a]) * invD;
-        float t1 = (max[a] - r.origin()[a]) * invD;
+        float t0 = (min[a] - origin[a]) * invD;
+        float t1 = (max[a] - origin[a]) * invD;
         if(invD < 0.0f)
             std::swap(t0, t1);
 

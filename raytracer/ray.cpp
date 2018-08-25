@@ -1,3 +1,3 @@
 #include "ray.h"
 
-U32 ray::rayCount_;
+std::atomic<U32> ray::rayCount_;

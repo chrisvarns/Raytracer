@@ -1,4 +1,6 @@
 #include <chrono>
+#include <array>
+#include <future>
 
 #include "raytracer.h"
 #include "glm/gtc/random.hpp"
@@ -97,33 +99,52 @@ void raytracer::setSize(int width, int height) {
     cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 0.4);
 }
 
-void raytracer::drawFrame(U8* writePtr) {
+void raytracer::drawFrame(U8* outPtr) {
     ray::resetRayCount();
     num_iterations_++;
-    auto colorAccumulatorItr = colorAccumulator.begin();
 
     auto start = std::chrono::steady_clock::now();
 
-    for(auto j = 0; j < height_; j++) {
-        float v = float(j + fastrandF()) / height_;
+    const int numThreads = 8;
+    std::array<std::future<void>, numThreads> futures;
 
-        for(auto i = 0; i < width_; i++) {
-            float u = float(i + fastrandF()) / width_;
+    int perThreadHeight = height_ / numThreads;
+    assert((height_ % numThreads) == 0);
 
-            ray r = cam.get_ray(u, v);
-            vec3 col = sqrt(color(r, world, 0));
+    for(int threadIdx = 0; threadIdx < numThreads; threadIdx++) {
 
-            vec3& accumulatedCol = *colorAccumulatorItr;
-            accumulatedCol += col;
-            colorAccumulatorItr++;
+        futures[threadIdx] = std::async(std::launch::async, [=]{
+            auto offset = width_ * perThreadHeight * threadIdx;
+            auto colorAccumulatorItr = colorAccumulator.begin() + offset;
+            auto writePtr = outPtr + offset * 4;
 
-            col = accumulatedCol / vec3(num_iterations_);
-            *(writePtr++) = U8(255.99 * col.r);
-            *(writePtr++) = U8(255.99 * col.g);
-            *(writePtr++) = U8(255.99 * col.b);
-            *(writePtr++) = 255;
-        }
+            auto jOffset = perThreadHeight * threadIdx;
+            for(auto j = jOffset;
+                j < jOffset + perThreadHeight; j++) {
+                float v = float(j + fastrandF()) / height_;
+
+                for(auto i = 0; i < width_; i++) {
+                    float u = float(i + fastrandF()) / width_;
+
+                    ray r = cam.get_ray(u, v);
+                    vec3 col = sqrt(color(r, world, 0));
+
+                    vec3& accumulatedCol = *colorAccumulatorItr;
+                    accumulatedCol += col;
+                    colorAccumulatorItr++;
+
+                    col = accumulatedCol / vec3(num_iterations_);
+                    *(writePtr++) = U8(255.99 * col.r);
+                    *(writePtr++) = U8(255.99 * col.g);
+                    *(writePtr++) = U8(255.99 * col.b);
+                    *(writePtr++) = 255;
+                }
+            }
+
+        });
     }
+
+    for(auto& future : futures) future.wait();
 
     const float millionth = 1.0e-6f;
     const float billionth = 1.0e-9f;

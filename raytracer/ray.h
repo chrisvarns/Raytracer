@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include "types.h"
 #include "glm/glm.hpp"
 
@@ -20,5 +21,5 @@ private:
     vec3 a, b;
     float time_;
 
-    static U32 rayCount_;
+    static std::atomic<U32> rayCount_;
 };
