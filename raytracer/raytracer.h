@@ -1,4 +1,6 @@
 #pragma once
+#include <array>
+#include <future>
 #include "glm/glm.hpp"
 #include "types.h"
 #include "hitablelist.h"
@@ -8,13 +10,18 @@
 using namespace glm;
 
 struct raytracer {
+    static const int numThreads = 8;
+
     raytracer();
 
     void setSize(int width, int height);
     void drawFrame(U8* output);
 
 private:
+    void doLoadBalancing(std::array<std::future<float>, numThreads>& futures);
+
     std::vector<vec3> colorAccumulator;
+    std::array<int, numThreads> perThreadAllotment;
 
     camera cam;
     vec3 lookfrom = vec3(13,2,3);

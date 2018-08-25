@@ -1,6 +1,4 @@
 #include <chrono>
-#include <array>
-#include <future>
 
 #include "raytracer.h"
 #include "glm/gtc/random.hpp"
@@ -93,11 +91,23 @@ void raytracer::setSize(int width, int height) {
     colorAccumulator.clear();
     colorAccumulator.resize(width * height);
 
+    int remainder = height_ % numThreads;
+    for(auto& threadAllotment : perThreadAllotment) {
+        threadAllotment = height_ / numThreads;
+        if(remainder) {
+            threadAllotment++;
+            remainder--;
+        }
+    }
+
     num_iterations_ = 0;
     total_mrays_ = 0;
 
     cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 0.4);
 }
+
+const float millionth = 1.0e-6f;
+const float billionth = 1.0e-9f;
 
 void raytracer::drawFrame(U8* outPtr) {
     ray::resetRayCount();
@@ -105,22 +115,18 @@ void raytracer::drawFrame(U8* outPtr) {
 
     auto start = std::chrono::steady_clock::now();
 
-    const int numThreads = 8;
-    std::array<std::future<void>, numThreads> futures;
+    std::array<std::future<float>, numThreads> futures;
 
-    int perThreadHeight = height_ / numThreads;
-    assert((height_ % numThreads) == 0);
-
+    int threadRowOffset = 0;
     for(int threadIdx = 0; threadIdx < numThreads; threadIdx++) {
-
-        futures[threadIdx] = std::async(std::launch::async, [=]{
-            auto offset = width_ * perThreadHeight * threadIdx;
+        futures[threadIdx] = std::async(std::launch::async, [=]() -> float {
+            auto start = std::chrono::steady_clock::now();
+            auto offset = width_ * threadRowOffset;
             auto colorAccumulatorItr = colorAccumulator.begin() + offset;
             auto writePtr = outPtr + offset * 4;
 
-            auto jOffset = perThreadHeight * threadIdx;
-            for(auto j = jOffset;
-                j < jOffset + perThreadHeight; j++) {
+            for(auto j = threadRowOffset;
+                j < threadRowOffset + perThreadAllotment[threadIdx]; j++) {
                 float v = float(j + fastrandF()) / height_;
 
                 for(auto i = 0; i < width_; i++) {
@@ -140,20 +146,57 @@ void raytracer::drawFrame(U8* outPtr) {
                     *(writePtr++) = 255;
                 }
             }
-
+            auto end = std::chrono::steady_clock::now();
+            auto diff = end - start;
+            float seconds = float(diff.count()) * billionth;
+            return seconds;
         });
+        threadRowOffset += perThreadAllotment[threadIdx];
     }
 
-    for(auto& future : futures) future.wait();
-
-    const float millionth = 1.0e-6f;
-    const float billionth = 1.0e-9f;
+    for(auto& future : futures)
+        future.wait();
 
     auto end = std::chrono::steady_clock::now();
-
     auto diff = end - start;
     float seconds = float(diff.count()) * billionth;
     float mrays = float(ray::rayCount()) / seconds * millionth;
     total_mrays_ += mrays;
-    printf("MRays/s: %.4f\t\tAverage: %.4f\n", mrays, total_mrays_ / num_iterations_);
+    printf("Time: %.4fs \t MRays/s: %.4f \t Average: %.4f \t ", seconds, mrays, total_mrays_ / num_iterations_);
+
+    doLoadBalancing(futures);
+}
+
+void raytracer::doLoadBalancing(std::array<std::future<float>, numThreads>& futures) {
+    float min = FLT_MAX;
+    float max = -FLT_MAX;
+    int minIdx = -1;
+    int maxIdx = -1;
+    for(int i = 0; i < numThreads; i++)
+    {
+        auto& future = futures[i];
+        float duration = future.get();
+
+        if(min > duration) {
+            min = duration;
+            minIdx = i;
+        }
+        if(max < duration) {
+            max = duration;
+            maxIdx = i;
+        }
+    }
+    float ratio = max / min;
+    printf("Ratio = %.4f\n", ratio);
+    float alpha = clamp(ratio - 1, 0.0f, 1.0f);
+    int numTransfer = (int)mix(1.0f, 20.0f, alpha);
+    perThreadAllotment[minIdx] += numTransfer;
+    perThreadAllotment[maxIdx] -= numTransfer;
+
+    printf("Allotment: \t");
+    for(auto value : perThreadAllotment)
+    {
+        printf("%d\t", value);
+    }
+    printf("\n");
 }
