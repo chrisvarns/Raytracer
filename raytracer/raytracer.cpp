@@ -4,12 +4,18 @@
 #include "glm/gtc/random.hpp"
 #include "material.h"
 #include "materials/dielectric.h"
+#include "materials/emissive.h"
 #include "materials/lambertian.h"
 #include "materials/metal.h"
 #include "textures/checker_texture.h"
 #include "textures/constant_texture.h"
 #include "movingsphere.h"
 #include "sphere.h"
+
+vec3 white(1);
+vec3 black(0);
+vec3 lilac (float(0xb1) / 255, float(0x9c) / 255, float(0xd9) / 255);
+vec3 blue (float(0x6c) / 255, float(0x9c) / 255, float(0xef) / 255);
 
 hitable_list basic_scene() {
     hitable_list list;
@@ -25,7 +31,7 @@ hitable_list basic_scene() {
 hitable_list random_scene() {
     hitable_list list;
     list.hitables.reserve(1000);
-    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(new checker_texture(new constant_texture(vec3(0.2, 0.3, 0.1)), new constant_texture(vec3(0.9, 0.9, 0.9))))));
+    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(new checker_texture(new constant_texture(lilac), new constant_texture(blue)))));
     for(int a = -11; a < 11; a++) {
         for(int b = -11; b < 11; b++) {
             float choose_mat = fastrandF();
@@ -44,7 +50,7 @@ hitable_list random_scene() {
         }
     }
     list.hitables.push_back(new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
-    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new constant_texture(vec3(0.4, 0.2, 0.1)))));
+    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new emissive(new constant_texture(vec3(1000)))));
     list.hitables.push_back(new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
 
     return list;
@@ -54,32 +60,28 @@ bvh_node convertListToBvh(const hitable_list& list, float time0, float time1) {
     return bvh_node(const_cast<const hitable**>(list.hitables.data()), int(list.hitables.size()), time0, time1);
 }
 
-vec3 blue(float(186) / float(255), float(205) / float(255), float(247) / float(255));
-vec3 red(float(220) / float(255), float(205) / float(255), float(226) / float(255));
-
 vec3 color(const ray& r, hitable& world, int depth) {
     hit_record rec;
     if(world.hit(r, 0.001, MAXFLOAT, rec)) {
         ray scattered;
         vec3 attenuation;
+        vec3 ret = rec.mat->emission(rec);
         if(depth < 50 && rec.mat->scatter(r, rec, attenuation, scattered)) {
-            return attenuation*color(scattered, world, depth+1);
+            return ret + attenuation*color(scattered, world, depth+1);
         }
         else {
-            return vec3(0);
+            return ret;
         }
     }
     else {
-        vec3 unit_direction = normalize(r.direction());
-        float t = 0.5 * (unit_direction.x + 1);
-        return (1-t)*blue + t*red;
+//        vec3 unit_direction = normalize(r.direction());
+//        float t = 0.5 * (unit_direction.x + 1);
+//        return (1-t)*lilac + t*lilac;
+        return vec3(0);
     }
 }
 
 raytracer::raytracer() {
-    blue = blue * blue;
-    red = red * red;
-
     list = random_scene();
     world = convertListToBvh(list, cam.time0, cam.time1);
 }
@@ -103,7 +105,7 @@ void raytracer::setSize(int width, int height) {
     num_iterations_ = 0;
     total_mrays_ = 0;
 
-    cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 0.4);
+    cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 0.0);
 }
 
 const float millionth = 1.0e-6f;
@@ -139,7 +141,7 @@ void raytracer::drawFrame(U8* outPtr) {
                     accumulatedCol += col;
                     colorAccumulatorItr++;
 
-                    col = accumulatedCol / vec3(num_iterations_);
+                    col = clamp(accumulatedCol / vec3(num_iterations_), vec3(0), vec3(1));
                     *(writePtr++) = U8(255.99 * col.r);
                     *(writePtr++) = U8(255.99 * col.g);
                     *(writePtr++) = U8(255.99 * col.b);

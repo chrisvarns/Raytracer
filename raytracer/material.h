@@ -5,4 +5,5 @@ using namespace glm;
 
 struct material {
     virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const = 0;
+    virtual vec3 emission(const hit_record& rec) const = 0;
 };
