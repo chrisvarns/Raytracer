@@ -1,11 +1,7 @@
 #include <chrono>
-#include <cstdio>
 
+#include "raytracer.h"
 #include "glm/gtc/random.hpp"
-
-#include "bvh_node.h"
-#include "camera.h"
-#include "hitablelist.h"
 #include "material.h"
 #include "materials/dielectric.h"
 #include "materials/lambertian.h"
@@ -13,7 +9,6 @@
 #include "textures/checker_texture.h"
 #include "textures/constant_texture.h"
 #include "movingsphere.h"
-#include "raytracer.h"
 #include "sphere.h"
 
 hitable_list basic_scene() {
@@ -81,66 +76,63 @@ vec3 color(const ray& r, hitable& world, int depth) {
     }
 }
 
-void redraw(U8* outPtr, int width, int height) {
-    
-#if DEBUG
-    const int ns = 2;
-#else
-    const int ns = 10;
-#endif
-
+raytracer::raytracer() {
     blue = blue * blue;
     red = red * red;
-    
-    vec3 lookfrom(13,2,3);
-    vec3 lookat(0,0.5,0);
-    float dist_to_focus = 10;
-    float aperture = 0.1;
-    camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(width)/height, aperture, dist_to_focus, 0.0, 0.4);
 
-    hitable_list list = basic_scene();
-    bvh_node world = convertListToBvh(list, cam.time0, cam.time1);
+    list = random_scene();
+    world = convertListToBvh(list, cam.time0, cam.time1);
+}
 
-    float total_mrays = 0.0f;
-    int numIterations = 0;
+void raytracer::setSize(int width, int height) {
+    width_ = width;
+    height_ = height;
 
-#define TIMINGLOOP 0
-#if TIMINGLOOP
-    while(true)
-#endif
-    {
-        ray::resetRayCount();
-        auto start = std::chrono::steady_clock::now();
+    colorAccumulator.clear();
+    colorAccumulator.resize(width * height);
 
-        auto* writePtr = outPtr;
+    num_iterations_ = 0;
+    total_mrays_ = 0;
 
-        for(auto j = 0; j < height; j++) {
-            for(auto i = 0; i < width; i++) {
-                vec3 col(0);
-                for(int s = 0; s < ns; s++) {
-                    float u = float(i + fastrandF()) / width;
-                    float v = float(j + fastrandF()) / height;
-                    ray r = cam.get_ray(u, v);
-                    col += color(r, world, 0);
-                }
-                col /= ns;
-                col = sqrt(col);
-                *(writePtr++) = U8(255.99 * col.r);
-                *(writePtr++) = U8(255.99 * col.g);
-                *(writePtr++) = U8(255.99 * col.b);
-                *(writePtr++) = 255;
-            }
+    cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 0.4);
+}
+
+void raytracer::drawFrame(U8* writePtr) {
+    ray::resetRayCount();
+    num_iterations_++;
+    auto colorAccumulatorItr = colorAccumulator.begin();
+
+    auto start = std::chrono::steady_clock::now();
+
+    for(auto j = 0; j < height_; j++) {
+        float v = float(j + fastrandF()) / height_;
+
+        for(auto i = 0; i < width_; i++) {
+            float u = float(i + fastrandF()) / width_;
+
+            ray r = cam.get_ray(u, v);
+            vec3 col = sqrt(color(r, world, 0));
+
+            vec3& accumulatedCol = *colorAccumulatorItr;
+            accumulatedCol += col;
+            colorAccumulatorItr++;
+
+            col = accumulatedCol / vec3(num_iterations_);
+            *(writePtr++) = U8(255.99 * col.r);
+            *(writePtr++) = U8(255.99 * col.g);
+            *(writePtr++) = U8(255.99 * col.b);
+            *(writePtr++) = 255;
         }
-
-        const float millionth = 1.0e-6f;
-        const float billionth = 1.0e-9f;
-
-        auto end = std::chrono::steady_clock::now();
-        auto diff = end - start;
-        float seconds = float(diff.count()) * billionth;
-        float mrays = float(ray::rayCount()) / seconds * millionth;
-        total_mrays += mrays;
-        numIterations++;
-        printf("MRays/s: %.4f\t\tAverage: %.4f\n", mrays, total_mrays / numIterations);
     }
+
+    const float millionth = 1.0e-6f;
+    const float billionth = 1.0e-9f;
+
+    auto end = std::chrono::steady_clock::now();
+
+    auto diff = end - start;
+    float seconds = float(diff.count()) * billionth;
+    float mrays = float(ray::rayCount()) / seconds * millionth;
+    total_mrays_ += mrays;
+    printf("MRays/s: %.4f\t\tAverage: %.4f\n", mrays, total_mrays_ / num_iterations_);
 }

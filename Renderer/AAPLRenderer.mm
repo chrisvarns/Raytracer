@@ -35,11 +35,11 @@ using namespace glm;
     // The current size of our view so we can use this in our render pipeline
     vector_uint2 _viewportSize;
     
-    bool _redrawBackBuffer;
-    
     std::vector<uint8>  _backBuffer;
     uint8*              _backBufferPtr;
     id<MTLTexture>      _backBufferTex;
+
+    raytracer           _raytracer;
     
     NSString* _outputPath;
 }
@@ -109,7 +109,7 @@ using namespace glm;
     _viewportSize.x = size.width;
     _viewportSize.y = size.height;
     [self createBackBufferTex];
-    _redrawBackBuffer = true;
+    _raytracer.setSize(size.width, size.height);
 }
 
 - (void)writeImageToDisk {
@@ -157,13 +157,11 @@ using namespace glm;
         { { -1,   1 }, { 0, 1 } },
         { {  1,   1 }, { 1, 1 } },
     };
-    
-    if(_redrawBackBuffer) {
-        _redrawBackBuffer = false;
-        redraw(_backBufferPtr, _viewportSize.x, _viewportSize.y);
-        [self writeImageToDisk];
-        [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
-    }
+
+    _raytracer.drawFrame(_backBufferPtr);
+
+    [self writeImageToDisk];
+    [_backBufferTex replaceRegion:MTLRegionMake2D(0, 0, _viewportSize.x, _viewportSize.y) mipmapLevel:0 withBytes:_backBufferPtr bytesPerRow:_viewportSize.x*4];
 
     // Create a new command buffer for each render pass to the current drawable
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
