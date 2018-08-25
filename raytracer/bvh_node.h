@@ -8,7 +8,7 @@ struct bvh_node : public hitable {
     bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
     bool bounding_box(float t0, float t1, aabb& box) const override;
 
-    aabb box;
-    const hitable* left;
-    const hitable* right;
+    aabb box_;
+    const hitable* left_;
+    const hitable* right_;
 };

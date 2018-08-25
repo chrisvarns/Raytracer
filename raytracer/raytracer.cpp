@@ -10,6 +10,8 @@
 #include "materials/dielectric.h"
 #include "materials/lambertian.h"
 #include "materials/metal.h"
+#include "textures/checker_texture.h"
+#include "textures/constant_texture.h"
 #include "movingsphere.h"
 #include "raytracer.h"
 #include "sphere.h"
@@ -17,9 +19,9 @@
 hitable_list basic_scene() {
     hitable_list list;
     list.hitables.reserve(1000);
-    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
+    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(new checker_texture(new constant_texture(vec3(0.2, 0.3, 0.1)), new constant_texture(vec3(0.9, 0.9, 0.9))))));
     list.hitables.push_back(new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
-    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1))));
+    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new constant_texture(vec3(0.4, 0.2, 0.1)))));
     list.hitables.push_back(new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
 
     return list;
@@ -28,14 +30,14 @@ hitable_list basic_scene() {
 hitable_list random_scene() {
     hitable_list list;
     list.hitables.reserve(1000);
-    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5))));
+    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(new checker_texture(new constant_texture(vec3(0.2, 0.3, 0.1)), new constant_texture(vec3(0.9, 0.9, 0.9))))));
     for(int a = -11; a < 11; a++) {
         for(int b = -11; b < 11; b++) {
             float choose_mat = fastrandF();
             vec3 center(a+0.9*fastrandF(),0.2,b+0.9*fastrandF());
             if(length(center-vec3(4,0.2,0)) > 0.9) {
                 if(choose_mat < 0.8) { // diffuse
-                    list.hitables.push_back(new movingsphere(center, center+vec3(0, 0.5*fastrandF(), 0), 0.0, 1.0, 0.2, new lambertian(vec3(fastrandF()*fastrandF(), fastrandF()*fastrandF(), fastrandF()*fastrandF()))));
+                    list.hitables.push_back(new movingsphere(center, center+vec3(0, 0.5*fastrandF(), 0), 0.0, 1.0, 0.2, new lambertian(new constant_texture(vec3(fastrandF()*fastrandF(), fastrandF()*fastrandF(), fastrandF()*fastrandF())))));
                 }
                 else if (choose_mat < 0.95) { // metal
                     list.hitables.push_back(new sphere(center, 0.2, new metal(vec3(0.5*(1+fastrandF()), 0.5*(1+fastrandF()), 0.5*(1+fastrandF())), 0.5*fastrandF())));
@@ -47,7 +49,7 @@ hitable_list random_scene() {
         }
     }
     list.hitables.push_back(new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
-    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1))));
+    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new constant_texture(vec3(0.4, 0.2, 0.1)))));
     list.hitables.push_back(new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
 
     return list;
@@ -96,13 +98,13 @@ void redraw(U8* outPtr, int width, int height) {
     float aperture = 0.1;
     camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(width)/height, aperture, dist_to_focus, 0.0, 0.4);
 
-    hitable_list list = random_scene();
+    hitable_list list = basic_scene();
     bvh_node world = convertListToBvh(list, cam.time0, cam.time1);
 
     float total_mrays = 0.0f;
     int numIterations = 0;
 
-#define TIMINGLOOP 1
+#define TIMINGLOOP 0
 #if TIMINGLOOP
     while(true)
 #endif
