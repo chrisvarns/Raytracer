@@ -1,5 +1,16 @@
 #include "perlin.h"
 
+float perlin::turb(vec3 p, int depth) const {
+    float accum = 0;
+    float weight = 1.0f;
+    for(int i = 0; i < depth; i++) {
+        accum += weight * noise(p);
+        weight *= 0.5f;
+        p *= 2;
+    }
+    return fabs(accum);
+}
+
 inline float perlin_interp(vec3 c[2][2][2], float u, float v, float w) {
     float uu = u*u*(3.0f-2.0f*u);
     float vv = v*v*(3.0f-2.0f*v);
