@@ -21,6 +21,9 @@ float perlin::noise(const vec3& p) const {
     float u = p.x - i;
     float v = p.y - j;
     float w = p.z - k;
+    u = u*u*(3-2*u);
+    v = v*v*(3-2*v);
+    w = w*w*(3-2*w);
     float c[2][2][2];
     for(int di = 0; di < 2; di++) {
         for(int dj = 0; dj < 2; dj++) {
