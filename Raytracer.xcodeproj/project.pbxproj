@@ -415,6 +415,8 @@
 				0D9A45C7212989F4000E90E3 /* materials */,
 				0D388EFD212A0E1A005C5BB4 /* movingsphere.cpp */,
 				0D388EFC212A0E1A005C5BB4 /* movingsphere.h */,
+				0D36F4F72132281A00ABE563 /* perlin.cpp */,
+				0D36F4F62132270400ABE563 /* perlin.h */,
 				0D28A5A1212C3AE10041483B /* rand.cpp */,
 				0D28A5A0212C3AE10041483B /* rand.h */,
 				0D28A59E212C29BE0041483B /* ray.cpp */,
@@ -426,8 +428,6 @@
 				0D36F4E72131B03200ABE563 /* texture.h */,
 				0D36F4EB2131B31A00ABE563 /* textures */,
 				0D276BB921297719006ACD11 /* types.h */,
-				0D36F4F62132270400ABE563 /* perlin.h */,
-				0D36F4F72132281A00ABE563 /* perlin.cpp */,
 			);
 			path = raytracer;
 			sourceTree = "<group>";
