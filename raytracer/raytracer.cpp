@@ -13,7 +13,7 @@
 #include "sphere.h"
 
 hitable_list two_perlin_spheres() {
-    material* lambert = new lambertian(new noise_texture());
+    material* lambert = new lambertian(new noise_texture(4));
     hitable_list list;
     list.hitables.reserve(2);
     list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, lambert));
