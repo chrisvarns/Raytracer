@@ -8,8 +8,18 @@
 #include "materials/metal.h"
 #include "textures/checker_texture.h"
 #include "textures/constant_texture.h"
+#include "textures/noise_texture.h"
 #include "movingsphere.h"
 #include "sphere.h"
+
+hitable_list two_perlin_spheres() {
+    material* lambert = new lambertian(new noise_texture());
+    hitable_list list;
+    list.hitables.reserve(2);
+    list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, lambert));
+    list.hitables.push_back(new sphere(vec3(0, 2, 0), 2, lambert));
+    return list;
+}
 
 hitable_list basic_scene() {
     hitable_list list;
@@ -80,7 +90,7 @@ raytracer::raytracer() {
     blue = blue * blue;
     red = red * red;
 
-    list = random_scene();
+    list = two_perlin_spheres();
     world = convertListToBvh(list, cam.time0, cam.time1);
 }
 
@@ -103,7 +113,7 @@ void raytracer::setSize(int width, int height) {
     num_iterations_ = 0;
     total_mrays_ = 0;
 
-    cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 0.4);
+    cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 1.0);
 }
 
 const float millionth = 1.0e-6f;

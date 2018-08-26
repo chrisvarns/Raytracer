@@ -25,9 +25,9 @@ private:
 
     camera cam;
     vec3 lookfrom = vec3(13,2,3);
-    vec3 lookat = vec3(0,0.5f,0);
+    vec3 lookat = vec3(0,0,0);
     float dist_to_focus = 10;
-    float aperture = 0.1f;
+    float aperture = 0;
 
     int width_ = -1;
     int height_ = -1;
