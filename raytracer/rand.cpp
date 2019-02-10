@@ -1,5 +1,6 @@
 #include "rand.h"
-unsigned int g_seed;
+#include "types.h"
+thread_local U32 g_seed;
 
-std::ranlux24_base base;
-std::uniform_real_distribution<float> urd(0.0, 1.0);
+thread_local std::ranlux24_base base;
+thread_local std::uniform_real_distribution<float> urd(0.0, 1.0);

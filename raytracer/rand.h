@@ -1,6 +1,6 @@
 #include <random>
 
-extern unsigned int g_seed;
+thread_local extern unsigned int g_seed;
  
 //Used to seed the generator.
 inline void fast_srand( int seed )
@@ -14,8 +14,8 @@ inline int fastrand()
     return (g_seed>>16)&0x7FFF;
 }
 
-extern std::ranlux24_base base;
-extern std::uniform_real_distribution<float> urd;
+thread_local extern std::ranlux24_base base;
+thread_local extern std::uniform_real_distribution<float> urd;
 
 inline float fastrandF() {
     return urd(base);
