@@ -173,7 +173,7 @@ void raytracer::drawFrame(U8* outPtr) {
     float seconds = float(diff.count()) * billionth;
     float mrays = float(ray::rayCount()) / seconds * millionth;
     total_mrays_ += mrays;
-    SDL_Log("Time: %.4fs \t MRays/s: %.4f \t Average: %.4f \t ", seconds, mrays, total_mrays_ / num_iterations_);
+    SDL_Log("Iteration: %d Time: %.4fs \t MRays/s: %.4f \t Average: %.4f \t ", num_iterations_, seconds, mrays, total_mrays_ / num_iterations_);
 
     doLoadBalancing(futures);
 }
@@ -204,10 +204,10 @@ void raytracer::doLoadBalancing(std::array<std::future<float>, numThreads>& futu
     perThreadAllotment[minIdx] += numTransfer;
     perThreadAllotment[maxIdx] -= numTransfer;
 
-    SDL_Log("Allotment: \t");
-    for(auto value : perThreadAllotment)
-    {
-        SDL_Log("%d\t", value);
-    }
+	/*SDL_Log("Allotment: \t");
+	for(auto value : perThreadAllotment)
+	{
+		SDL_Log("%d\t", value);
+	}*/
     SDL_Log("\n");
 }
