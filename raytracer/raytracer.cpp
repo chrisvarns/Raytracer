@@ -11,6 +11,7 @@
 #include "textures/noise_texture.h"
 #include "movingsphere.h"
 #include "sphere.h"
+#include "SDL_log.h"
 
 hitable_list two_perlin_spheres() {
     material* lambert = new lambertian(new noise_texture(4));
@@ -172,7 +173,7 @@ void raytracer::drawFrame(U8* outPtr) {
     float seconds = float(diff.count()) * billionth;
     float mrays = float(ray::rayCount()) / seconds * millionth;
     total_mrays_ += mrays;
-    printf("Time: %.4fs \t MRays/s: %.4f \t Average: %.4f \t ", seconds, mrays, total_mrays_ / num_iterations_);
+    SDL_Log("Time: %.4fs \t MRays/s: %.4f \t Average: %.4f \t ", seconds, mrays, total_mrays_ / num_iterations_);
 
     doLoadBalancing(futures);
 }
@@ -197,16 +198,16 @@ void raytracer::doLoadBalancing(std::array<std::future<float>, numThreads>& futu
         }
     }
     float ratio = max / min;
-    printf("Ratio = %.4f\n", ratio);
+    SDL_Log("Ratio = %.4f\n", ratio);
     float alpha = clamp(ratio - 1, 0.0f, 1.0f);
     int numTransfer = (int)mix(1.0f, 20.0f, alpha);
     perThreadAllotment[minIdx] += numTransfer;
     perThreadAllotment[maxIdx] -= numTransfer;
 
-    printf("Allotment: \t");
+    SDL_Log("Allotment: \t");
     for(auto value : perThreadAllotment)
     {
-        printf("%d\t", value);
+        SDL_Log("%d\t", value);
     }
-    printf("\n");
+    SDL_Log("\n");
 }
