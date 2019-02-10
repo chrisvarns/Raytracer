@@ -8,21 +8,6 @@
 const int width = 640;
 const int height = 480;
 
-void reorder(U8* output) {
-
-	const auto lineSize = width * 4;
-	char tmp[lineSize];
-
-	for (int firstIdx = 0; firstIdx < height / 2; firstIdx++) {
-		auto lastIdx = height - firstIdx - 1;
-		auto* first = output + lineSize * firstIdx;
-		auto* last = output + lineSize * lastIdx;
-		memcpy(tmp, first, lineSize);
-		memcpy(first, last, lineSize);
-		memcpy(last, tmp, lineSize);
-	}
-}
-
 int main(int argc, char* argv[]) {
 
 	SDL_Init(SDL_INIT_VIDEO);
@@ -63,7 +48,6 @@ int main(int argc, char* argv[]) {
 		SDL_RenderPresent(renderer);
 	}
 
-	reorder(output);
 	stbi_write_png("output.png", width, height, 4, output, 0);
 	free(output);
 

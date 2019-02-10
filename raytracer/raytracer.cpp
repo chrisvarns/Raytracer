@@ -138,11 +138,10 @@ void raytracer::drawFrame(U8* outPtr) {
 
             for(auto j = threadRowOffset;
                 j < threadRowOffset + perThreadAllotment[threadIdx]; j++) {
-                float v = float(j + fastrandF()) / height_;
+                float v = 1.0f - (float(j) + fastrandF()) / height_;
 
                 for(auto i = 0; i < width_; i++) {
-                    float u = float(i + fastrandF()) / width_;
-
+					float u = (float(i) + fastrandF()) / width_;
                     ray r = cam.get_ray(u, v);
                     vec3 col = sqrt(color(r, world, 0));
 
