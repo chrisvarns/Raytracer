@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 		SDL_WINDOWPOS_UNDEFINED,
 		width,
 		height,
-		0);
+		SDL_WINDOW_SHOWN);
 	assert(window);
 
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
