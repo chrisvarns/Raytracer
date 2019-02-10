@@ -197,7 +197,7 @@ void raytracer::doLoadBalancing(std::array<std::future<float>, numThreads>& futu
         }
     }
     float ratio = max / min;
-    SDL_Log("Ratio = %.4f\n", ratio);
+    //SDL_Log("Ratio = %.4f\n", ratio);
     float alpha = clamp(ratio - 1, 0.0f, 1.0f);
     int numTransfer = (int)mix(1.0f, 20.0f, alpha);
     perThreadAllotment[minIdx] += numTransfer;
