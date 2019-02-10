@@ -1,6 +1,6 @@
 /// @ref gtc_random
 /// @file glm/gtc/random.inl
-#include "raytracer/rand.h"
+#include "rand.h"
 #include "../geometric.hpp"
 #include "../exponential.hpp"
 #include "../trigonometric.hpp"

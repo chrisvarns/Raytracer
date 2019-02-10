@@ -1,4 +1,6 @@
 #include "perlin.h"
+#include "rand.h"
+#include <stdlib.h>
 
 float perlin::turb(vec3 p, int depth) const {
     float accum = 0;
@@ -51,14 +53,14 @@ float perlin::noise(const vec3& p) const {
 static vec3* perlin_generate() {
     vec3* p = new vec3[256];
     for(int i = 0; i < 256; i++) {
-        p[i] = normalize(vec3(-1.0f + 2.0f*drand48(), -1.0f + 2.0f*drand48(), -1.0f + 2.0f*drand48()));
+        p[i] = normalize(vec3(-1.0f + 2.0f*fastrandF(), -1.0f + 2.0f*fastrandF(), -1.0f + 2.0f*fastrandF()));
     }
     return p;
 }
 
 void permute(int* p, int n) {
     for(int i = n-1; i > 0; i--) {
-        int target = int(drand48()*(i+1));
+        int target = int(fastrandF()*(i+1));
         std::swap(p[i], p[target]);
     }
 }
