@@ -21,12 +21,13 @@ int main(int argc, char* argv[]) {
 	assert(window);
 
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
-	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width, height);
 
 	raytracer _raytracer;
 	_raytracer.setSize(width, height);
 
 	U8* output = (U8*)malloc(width * height * 4);
+	memset(output, 0, width*height * 4);
 
 	bool quit = false;
 	SDL_Event event;
