@@ -14,7 +14,8 @@ struct raytracer {
 
     raytracer();
 
-    void setSize(int width, int height);
+	void setSize(int width, int height);
+	void setupScene();
     void drawFrame(U8* output);
 
 private:
@@ -36,5 +37,6 @@ private:
     float total_mrays_ = 0;
 
     hitable_list list;
-    bvh_node world;
+    bvh_node bvh;
+	hitable* world;
 };

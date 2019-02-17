@@ -130,6 +130,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="raytracer\stb_image.cpp" />
+    <ClCompile Include="raytracer\stb_image_write.cpp" />
+    <ClCompile Include="raytracer\textures\image_texture.cpp" />
     <ClCompile Include="raytracer\aabb.cpp" />
     <ClCompile Include="raytracer\bvh_node.cpp" />
     <ClCompile Include="raytracer\camera.cpp" />
@@ -148,6 +151,7 @@
     <ClCompile Include="raytracer\textures\checker_texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="raytracer\textures\image_texture.h" />
     <ClInclude Include="raytracer\aabb.h" />
     <ClInclude Include="raytracer\bvh_node.h" />
     <ClInclude Include="raytracer\camera.h" />

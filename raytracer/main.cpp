@@ -1,8 +1,5 @@
 #include "raytracer.h"
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
-
 #include "SDL.h"
 
 const int width = 640;
@@ -25,6 +22,7 @@ int main(int argc, char* argv[]) {
 
 	raytracer _raytracer;
 	_raytracer.setSize(width, height);
+	_raytracer.setupScene();
 
 	U8* output = (U8*)malloc(width * height * 4);
 	memset(output, 0, width*height * 4);

@@ -9,9 +9,21 @@
 #include "textures/checker_texture.h"
 #include "textures/constant_texture.h"
 #include "textures/noise_texture.h"
+#include "textures/image_texture.h"
 #include "movingsphere.h"
 #include "sphere.h"
 #include "SDL_log.h"
+#include "stb/stb_image.h"
+
+hitable_list globe_scene()
+{	
+	hitable_list list;
+	list.hitables.reserve(1);
+	int nx, ny, nn;
+	unsigned char* tex_data = stbi_load("earthmap.jpg", &nx, &ny, &nn, 0);
+	list.hitables.push_back(new sphere(vec3(0, 0, 0), 2, new lambertian(new image_texture(tex_data, nx, ny))));
+	return list;
+}
 
 hitable_list two_perlin_spheres() {
     material* lambert = new lambertian(new noise_texture(4));
@@ -56,7 +68,11 @@ hitable_list random_scene() {
     }
     list.hitables.push_back(new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
     list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new constant_texture(vec3(0.4, 0.2, 0.1)))));
-    list.hitables.push_back(new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
+	list.hitables.push_back(new sphere(vec3(-8, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
+
+	int nx, ny, nn;
+	unsigned char* tex_data = stbi_load("earthmap.jpg", &nx, &ny, &nn, 0);
+	list.hitables.push_back(new sphere(vec3(4, 1, 0), 1, new lambertian(new image_texture(tex_data, nx, ny))));
 
     return list;
 }
@@ -90,9 +106,15 @@ vec3 color(const ray& r, hitable& world, int depth) {
 raytracer::raytracer() {
     blue = blue * blue;
     red = red * red;
+}
 
-    list = two_perlin_spheres();
-    world = convertListToBvh(list, cam.time0, cam.time1);
+void raytracer::setupScene()
+{
+	//list = two_perlin_spheres();
+	list = random_scene();
+	//list = globe_scene();
+	bvh = convertListToBvh(list, cam.time0, cam.time1);
+	world = &bvh;
 }
 
 void raytracer::setSize(int width, int height) {
@@ -143,7 +165,7 @@ void raytracer::drawFrame(U8* outPtr) {
                 for(auto i = 0; i < width_; i++) {
 					float u = (float(i) + fastrandF()) / width_;
                     ray r = cam.get_ray(u, v);
-                    vec3 col = sqrt(color(r, world, 0));
+                    vec3 col = sqrt(color(r, *world, 0));
 
                     vec3& accumulatedCol = *colorAccumulatorItr;
                     accumulatedCol += col;
