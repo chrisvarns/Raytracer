@@ -67,7 +67,7 @@ hitable_list random_scene() {
         }
     }
     list.hitables.push_back(new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
-    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new constant_texture(vec3(0.4, 0.2, 0.1)))));
+    list.hitables.push_back(new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new noise_texture(10))));
 	list.hitables.push_back(new sphere(vec3(-8, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0)));
 
 	int nx, ny, nn;
