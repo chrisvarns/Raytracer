@@ -1,19 +1,57 @@
 #include <chrono>
 
-#include "raytracer.h"
 #include "glm/gtc/random.hpp"
+#include "SDL_log.h"
+#include "stb/stb_image.h"
+
+#include "raytracer.h"
 #include "material.h"
 #include "materials/dielectric.h"
 #include "materials/lambertian.h"
 #include "materials/metal.h"
+#include "materials/diffuse_light.h"
 #include "textures/checker_texture.h"
 #include "textures/constant_texture.h"
 #include "textures/noise_texture.h"
 #include "textures/image_texture.h"
-#include "movingsphere.h"
-#include "sphere.h"
-#include "SDL_log.h"
-#include "stb/stb_image.h"
+#include "shapes/movingsphere.h"
+#include "shapes/sphere.h"
+#include "shapes/rects/xy_rect.h"
+#include "shapes/rects/xz_rect.h"
+#include "shapes/rects/yz_rect.h"
+#include "flip_normals.h"
+
+hitable_list cornell_box()
+{
+	hitable_list list;
+	list.hitables.reserve(6);
+
+	material* red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
+	material* white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
+	material* green = new lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
+	material* light = new diffuse_light(new constant_texture(vec3(15, 15, 15)));
+
+	list.hitables.push_back(new flip_normals(new yz_rect(0, 555, 0, 555, 555, green)));
+	list.hitables.push_back(new yz_rect(0, 555, 0, 555, 0, red));
+	list.hitables.push_back(new xz_rect(213, 343, 227, 332, 554, light));
+	list.hitables.push_back(new flip_normals(new xz_rect(0, 555, 0, 555, 555, white)));
+	list.hitables.push_back(new xz_rect(0, 555, 0, 555, 0, white));
+	list.hitables.push_back(new flip_normals(new xy_rect(0, 555, 0, 555, 555, white)));
+
+	return list;
+}
+
+hitable_list simple_light_scene()
+{
+	texture* pertext = new noise_texture(4);
+	hitable_list list;
+	list.hitables.reserve(4);
+	list.hitables.push_back(new sphere(vec3(0, -1000, 0), 1000, new lambertian(pertext)));
+	list.hitables.push_back(new sphere(vec3(0, 2, 0), 2, new lambertian(pertext)));
+	list.hitables.push_back(new sphere(vec3(0, 7, 0), 2, new diffuse_light(new constant_texture(vec3(4,4,4)))));
+	list.hitables.push_back(new xy_rect(3, 5, 1, 3, -2, new diffuse_light(new constant_texture(vec3(4,4,4)))));
+	return list;
+}
 
 hitable_list globe_scene()
 {	
@@ -89,17 +127,19 @@ vec3 color(const ray& r, hitable& world, int depth) {
     if(world.hit(r, 0.001, FLT_MAX, rec)) {
         ray scattered;
         vec3 attenuation;
+		vec3 emitted = rec.mat->emitted(rec.u, rec.v, rec.p);
         if(depth < 50 && rec.mat->scatter(r, rec, attenuation, scattered)) {
-            return attenuation*color(scattered, world, depth+1);
+            return emitted + attenuation*color(scattered, world, depth+1);
         }
         else {
-            return vec3(0);
+            return emitted;
         }
     }
     else {
-        vec3 unit_direction = normalize(r.direction());
-        float t = 0.5 * (unit_direction.x + 1);
-        return (1-t)*blue + t*red;
+		return vec3();
+		/*vec3 unit_direction = normalize(r.direction());
+		float t = 0.5 * (unit_direction.x + 1);
+		return (1-t)*blue + t*red;*/
     }
 }
 
@@ -111,11 +151,38 @@ raytracer::raytracer() {
 void raytracer::setupScene()
 {
 	//list = two_perlin_spheres();
-	list = random_scene();
+	//list = random_scene();
 	//list = globe_scene();
+	//list = simple_light_scene();
+	list = cornell_box();
 	bvh = convertListToBvh(list, cam.time0, cam.time1);
-	world = &bvh;
+	world = &list;
 }
+
+void raytracer::set_camera_spheres()
+{
+	lookfrom = vec3(13, 2, 3);
+	lookat = vec3(0, 0, 0);
+	dist_to_focus = 10;
+	aperture = 0;
+	vfov = 45;
+	vec3 world_up = vec3(0, 1, 0);
+
+	cam = camera(lookfrom, lookat, world_up, vfov, float(width_) / height_, aperture, dist_to_focus, 0.0, 1.0);
+}
+
+void raytracer::set_camera_cornellbox()
+{
+	lookfrom = vec3(278, 278, -800);
+	lookat = vec3(278, 278, 0);
+	dist_to_focus = 10;
+	aperture = 0;
+	vfov = 80;
+	vec3 world_up = vec3(0, 1, 0);
+
+	cam = camera(lookfrom, lookat, world_up, vfov, float(width_) / height_, aperture, dist_to_focus, 0.0, 1.0);
+}
+
 
 void raytracer::setSize(int width, int height) {
     width_ = width;
@@ -136,7 +203,8 @@ void raytracer::setSize(int width, int height) {
     num_iterations_ = 0;
     total_mrays_ = 0;
 
-    cam = camera(lookfrom, lookat, vec3(0,1,0), 20, float(width_)/height_, aperture, dist_to_focus, 0.0, 1.0);
+	//set_camera_spheres();
+	set_camera_cornellbox();
 }
 
 const float millionth = 1.0e-6f;

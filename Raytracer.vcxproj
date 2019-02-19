@@ -130,6 +130,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="raytracer\flip_normals.cpp" />
+    <ClCompile Include="raytracer\shapes\rects\xy_rect.cpp" />
     <ClCompile Include="raytracer\stb_image.cpp" />
     <ClCompile Include="raytracer\stb_image_write.cpp" />
     <ClCompile Include="raytracer\textures\image_texture.cpp" />
@@ -142,15 +144,20 @@
     <ClCompile Include="raytracer\materials\dielectric.cpp" />
     <ClCompile Include="raytracer\materials\lambertian.cpp" />
     <ClCompile Include="raytracer\materials\metal.cpp" />
-    <ClCompile Include="raytracer\movingsphere.cpp" />
+    <ClCompile Include="raytracer\shapes\movingsphere.cpp" />
     <ClCompile Include="raytracer\perlin.cpp" />
     <ClCompile Include="raytracer\rand.cpp" />
     <ClCompile Include="raytracer\ray.cpp" />
     <ClCompile Include="raytracer\raytracer.cpp" />
-    <ClCompile Include="raytracer\sphere.cpp" />
+    <ClCompile Include="raytracer\shapes\sphere.cpp" />
     <ClCompile Include="raytracer\textures\checker_texture.cpp" />
+    <ClCompile Include="raytracer\shapes\rects\xz_rect.cpp" />
+    <ClCompile Include="raytracer\shapes\rects\yz_rect.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="raytracer\flip_normals.h" />
+    <ClInclude Include="raytracer\materials\diffuse_light.h" />
+    <ClInclude Include="raytracer\shapes\rects\xy_rect.h" />
     <ClInclude Include="raytracer\textures\image_texture.h" />
     <ClInclude Include="raytracer\aabb.h" />
     <ClInclude Include="raytracer\bvh_node.h" />
@@ -161,17 +168,19 @@
     <ClInclude Include="raytracer\materials\dielectric.h" />
     <ClInclude Include="raytracer\materials\lambertian.h" />
     <ClInclude Include="raytracer\materials\metal.h" />
-    <ClInclude Include="raytracer\movingsphere.h" />
+    <ClInclude Include="raytracer\shapes\movingsphere.h" />
     <ClInclude Include="raytracer\perlin.h" />
     <ClInclude Include="raytracer\rand.h" />
     <ClInclude Include="raytracer\ray.h" />
     <ClInclude Include="raytracer\raytracer.h" />
-    <ClInclude Include="raytracer\sphere.h" />
+    <ClInclude Include="raytracer\shapes\sphere.h" />
     <ClInclude Include="raytracer\texture.h" />
     <ClInclude Include="raytracer\textures\checker_texture.h" />
     <ClInclude Include="raytracer\textures\constant_texture.h" />
     <ClInclude Include="raytracer\textures\noise_texture.h" />
     <ClInclude Include="raytracer\types.h" />
+    <ClInclude Include="raytracer\shapes\rects\xz_rect.h" />
+    <ClInclude Include="raytracer\shapes\rects\yz_rect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="targets\CopyDLLs.targets">

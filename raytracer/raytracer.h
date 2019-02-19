@@ -20,15 +20,15 @@ struct raytracer {
 
 private:
     void doLoadBalancing(std::array<std::future<float>, numThreads>& futures);
+	void set_camera_spheres();
+	void set_camera_cornellbox();
 
     std::vector<vec3> colorAccumulator;
     std::array<int, numThreads> perThreadAllotment;
 
     camera cam;
-    vec3 lookfrom = vec3(13,2,3);
-    vec3 lookat = vec3(0,0,0);
-    float dist_to_focus = 10;
-    float aperture = 0;
+	vec3 lookfrom, lookat;
+	float dist_to_focus, aperture, vfov;
 
     int width_ = -1;
     int height_ = -1;

@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include "hitable.h"
-#include "sphere.h"
-#include "movingsphere.h"
+#include "shapes/sphere.h"
+#include "shapes/movingsphere.h"
 
 struct hitable_list : public hitable {
     hitable_list() {}
