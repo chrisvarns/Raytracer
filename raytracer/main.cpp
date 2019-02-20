@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	_raytracer.stop();
+	_raytracer.requestStop();
 	main_thread.wait();
 
 	stbi_write_png("output.png", width, height, 4, output, 0);

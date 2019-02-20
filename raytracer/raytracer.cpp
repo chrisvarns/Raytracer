@@ -207,9 +207,6 @@ void raytracer::setSize(int width, int height) {
 	set_camera_cornellbox();
 }
 
-const float millionth = 1.0e-6f;
-const float billionth = 1.0e-9f;
-
 void raytracer::mainthread()
 {
 	// Create the mems

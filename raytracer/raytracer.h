@@ -29,14 +29,12 @@ struct raytracer {
 	};
 	std::future<void> start(startParams params);
 
-	void stop() { stopRequested = true; }
-    
-	//void drawFrame(U8* output);
+	void requestStop() { stopRequested = true; }
 
 private:
 	void mainthread();
 	void workerthread();
-    //void doLoadBalancing(std::array<std::future<float>, numThreads>& futures);
+
 	void set_camera_spheres();
 	void set_camera_cornellbox();
 
