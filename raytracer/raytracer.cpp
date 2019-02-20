@@ -137,10 +137,10 @@ vec3 color(const ray& r, hitable& world, int depth) {
         }
     }
     else {
-		return vec3();
-		/*vec3 unit_direction = normalize(r.direction());
+		//return vec3();
+		vec3 unit_direction = normalize(r.direction());
 		float t = 0.5 * (unit_direction.x + 1);
-		return (1-t)*blue + t*red;*/
+		return (1-t)*blue + t*red;
     }
 }
 
@@ -152,10 +152,10 @@ raytracer::raytracer() {
 void raytracer::setupScene()
 {
 	//list = two_perlin_spheres();
-	//list = random_scene();
+	list = random_scene();
 	//list = globe_scene();
 	//list = simple_light_scene();
-	list = cornell_box();
+	//list = cornell_box();
 	bvh = convertListToBvh(list, cam.time0, cam.time1);
 	world = &bvh;
 }
@@ -172,14 +172,14 @@ std::future<void> raytracer::start(startParams params)
 
 void raytracer::set_camera_spheres()
 {
-	lookfrom = vec3(13, 2, 3);
+	lookfrom = vec3(10, 2, 6);
 	lookat = vec3(0, 0, 0);
 	dist_to_focus = 10;
 	aperture = 0;
-	vfov = 45;
+	vfov = 40;
 	vec3 world_up = vec3(0, 1, 0);
 
-	cam = camera(lookfrom, lookat, world_up, vfov, float(width_) / height_, aperture, dist_to_focus, 0.0, 1.0);
+	cam = camera(lookfrom, lookat, world_up, vfov, float(width_) / height_, aperture, dist_to_focus, 0.0, 0.0);
 }
 
 void raytracer::set_camera_cornellbox()
@@ -203,8 +203,8 @@ void raytracer::setSize(int width, int height) {
 
     num_iterations_ = 0;
 
-	//set_camera_spheres();
-	set_camera_cornellbox();
+	set_camera_spheres();
+	//set_camera_cornellbox();
 }
 
 void raytracer::mainthread()
