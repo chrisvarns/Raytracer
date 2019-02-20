@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <future>
+
 #include "glm/glm.hpp"
 #include "types.h"
 #include "hitablelist.h"
@@ -9,22 +10,39 @@
 
 using namespace glm;
 
+class SDL_Renderer;
+class SDL_Texture;
+
 struct raytracer {
-    static const int numThreads = 8;
+    static const int numThreads = 4;
 
     raytracer();
 
 	void setSize(int width, int height);
 	void setupScene();
-    void drawFrame(U8* output);
+
+	struct startParams
+	{
+		U8* output;
+		SDL_Renderer* renderer;
+		SDL_Texture* texture;
+	};
+	std::future<void> start(startParams params);
+
+	void stop() { stopRequested = true; }
+    
+	//void drawFrame(U8* output);
 
 private:
-    void doLoadBalancing(std::array<std::future<float>, numThreads>& futures);
+	void mainthread();
+	void workerthread();
+    //void doLoadBalancing(std::array<std::future<float>, numThreads>& futures);
 	void set_camera_spheres();
 	void set_camera_cornellbox();
 
-    std::vector<vec3> colorAccumulator;
-    std::array<int, numThreads> perThreadAllotment;
+	void accumulate(U8* output, std::vector<vec3>& filledMem);
+	std::vector<vec3> colorAccumulator;
+	int num_iterations_ = 0;
 
     camera cam;
 	vec3 lookfrom, lookat;
@@ -33,10 +51,19 @@ private:
     int width_ = -1;
     int height_ = -1;
 
-    int num_iterations_ = 0;
-    float total_mrays_ = 0;
-
     hitable_list list;
     bvh_node bvh;
 	hitable* world;
+
+	startParams params_;
+
+	std::vector<std::vector<vec3>*> availableMems;
+	std::mutex availableMems_mutex;
+	std::condition_variable availableMems_cv;
+
+	std::vector<std::vector<vec3>*> filledMems;
+	std::mutex filledMems_mutex;
+	std::condition_variable filledMems_cv;
+	
+	bool stopRequested = false;
 };

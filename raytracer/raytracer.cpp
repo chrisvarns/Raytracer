@@ -1,6 +1,7 @@
 #include <chrono>
 
 #include "glm/gtc/random.hpp"
+#include "SDL.h"
 #include "SDL_log.h"
 #include "stb/stb_image.h"
 
@@ -29,7 +30,7 @@ hitable_list cornell_box()
 	material* red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
 	material* white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
 	material* green = new lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
-	material* light = new diffuse_light(new constant_texture(vec3(15, 15, 15)));
+	material* light = new diffuse_light(new constant_texture(vec3(25, 25, 25)));
 
 	list.hitables.push_back(new flip_normals(new yz_rect(0, 555, 0, 555, 555, green)));
 	list.hitables.push_back(new yz_rect(0, 555, 0, 555, 0, red));
@@ -156,7 +157,17 @@ void raytracer::setupScene()
 	//list = simple_light_scene();
 	list = cornell_box();
 	bvh = convertListToBvh(list, cam.time0, cam.time1);
-	world = &list;
+	world = &bvh;
+}
+
+std::future<void> raytracer::start(startParams params)
+{
+	params_ = params;
+
+	return std::async(std::launch::async, [this]() -> void
+	{
+		this->mainthread();
+	});
 }
 
 void raytracer::set_camera_spheres()
@@ -177,12 +188,11 @@ void raytracer::set_camera_cornellbox()
 	lookat = vec3(278, 278, 0);
 	dist_to_focus = 10;
 	aperture = 0;
-	vfov = 80;
+	vfov = 40;
 	vec3 world_up = vec3(0, 1, 0);
 
 	cam = camera(lookfrom, lookat, world_up, vfov, float(width_) / height_, aperture, dist_to_focus, 0.0, 1.0);
 }
-
 
 void raytracer::setSize(int width, int height) {
     width_ = width;
@@ -191,17 +201,7 @@ void raytracer::setSize(int width, int height) {
     colorAccumulator.clear();
     colorAccumulator.resize(width * height);
 
-    int remainder = height_ % numThreads;
-    for(auto& threadAllotment : perThreadAllotment) {
-        threadAllotment = height_ / numThreads;
-        if(remainder) {
-            threadAllotment++;
-            remainder--;
-        }
-    }
-
     num_iterations_ = 0;
-    total_mrays_ = 0;
 
 	//set_camera_spheres();
 	set_camera_cornellbox();
@@ -210,93 +210,122 @@ void raytracer::setSize(int width, int height) {
 const float millionth = 1.0e-6f;
 const float billionth = 1.0e-9f;
 
-void raytracer::drawFrame(U8* outPtr) {
-    ray::resetRayCount();
-    num_iterations_++;
+void raytracer::mainthread()
+{
+	// Create the mems
+	std::vector<std::vector<vec3>> workingMems;
+	workingMems.resize(numThreads + 2);
+	for (auto& workingMem : workingMems)
+	{
+		workingMem.resize(width_ * height_);
+		availableMems.push_back(&workingMem);
+	}
 
-    auto start = std::chrono::steady_clock::now();
+	// Kick off the workers
+	std::vector<std::future<void>> threads;
+	for (int i = 0; i < numThreads; ++i)
+	{
+		threads.push_back(std::async(std::launch::async, [this]() -> void
+		{
+			this->workerthread();
+		}));
+	}
 
-    std::array<std::future<float>, numThreads> futures;
+	std::vector<std::future<void>> workers;
+	while (!stopRequested)
+	{
+		// Wait for work to be completed by workers
+		std::vector<vec3>* filledMem = nullptr;
+		{
+			std::unique_lock<std::mutex> lock(filledMems_mutex);
+			filledMems_cv.wait(lock, [this] { return filledMems.size() > 0; });
+			filledMem = filledMems.back();
+			filledMems.pop_back();
+			lock.unlock();
+		}
 
-    int threadRowOffset = 0;
-    for(int threadIdx = 0; threadIdx < numThreads; threadIdx++) {
-        futures[threadIdx] = std::async(std::launch::async, [=]() -> float {
-            auto start = std::chrono::steady_clock::now();
-            auto offset = width_ * threadRowOffset;
-            auto colorAccumulatorItr = colorAccumulator.begin() + offset;
-            auto writePtr = outPtr + offset * 4;
+		accumulate(params_.output, *filledMem);
 
-            for(auto j = threadRowOffset;
-                j < threadRowOffset + perThreadAllotment[threadIdx]; j++) {
-                float v = 1.0f - (float(j) + fastrandF()) / height_;
+		{
+			std::lock_guard<std::mutex> lock(availableMems_mutex);
+			availableMems.push_back(filledMem);
+		}
+		availableMems_cv.notify_one();
 
-                for(auto i = 0; i < width_; i++) {
-					float u = (float(i) + fastrandF()) / width_;
-                    ray r = cam.get_ray(u, v);
-                    vec3 col = sqrt(color(r, *world, 0));
+		SDL_UpdateTexture(params_.texture, NULL, params_.output, width_ * 4);
+		SDL_RenderCopy(params_.renderer, params_.texture, NULL, NULL);
+		SDL_RenderPresent(params_.renderer);
+	}
 
-                    vec3& accumulatedCol = *colorAccumulatorItr;
-                    accumulatedCol += col;
-                    colorAccumulatorItr++;
+	for (auto& worker : workers)
+	{
+		worker.wait();
+	}
 
-                    col = accumulatedCol / vec3(num_iterations_);
-                    *(writePtr++) = U8(255.99 * col.r);
-                    *(writePtr++) = U8(255.99 * col.g);
-                    *(writePtr++) = U8(255.99 * col.b);
-                    *(writePtr++) = 255;
-                }
-            }
-            auto end = std::chrono::steady_clock::now();
-            auto diff = end - start;
-            float seconds = float(diff.count()) * billionth;
-            return seconds;
-        });
-        threadRowOffset += perThreadAllotment[threadIdx];
-    }
-
-    for(auto& future : futures)
-        future.wait();
-
-    auto end = std::chrono::steady_clock::now();
-    auto diff = end - start;
-    float seconds = float(diff.count()) * billionth;
-    float mrays = float(ray::rayCount()) / seconds * millionth;
-    total_mrays_ += mrays;
-    SDL_Log("Iteration: %d Time: %.4fs \t MRays/s: %.4f \t Average: %.4f \t ", num_iterations_, seconds, mrays, total_mrays_ / num_iterations_);
-
-    doLoadBalancing(futures);
+	for (auto& filledMem : filledMems)
+	{
+		accumulate(params_.output, *filledMem);
+	}
 }
 
-void raytracer::doLoadBalancing(std::array<std::future<float>, numThreads>& futures) {
-    float min = FLT_MAX;
-    float max = -FLT_MAX;
-    int minIdx = -1;
-    int maxIdx = -1;
-    for(int i = 0; i < numThreads; i++)
-    {
-        auto& future = futures[i];
-        float duration = future.get();
-
-        if(min > duration) {
-            min = duration;
-            minIdx = i;
-        }
-        if(max < duration) {
-            max = duration;
-            maxIdx = i;
-        }
-    }
-    float ratio = max / min;
-    //SDL_Log("Ratio = %.4f\n", ratio);
-    float alpha = clamp(ratio - 1, 0.0f, 1.0f);
-    int numTransfer = (int)mix(1.0f, 20.0f, alpha);
-    perThreadAllotment[minIdx] += numTransfer;
-    perThreadAllotment[maxIdx] -= numTransfer;
-
-	/*SDL_Log("Allotment: \t");
-	for(auto value : perThreadAllotment)
+void raytracer::workerthread()
+{
+	while (!stopRequested)
 	{
-		SDL_Log("%d\t", value);
-	}*/
-    SDL_Log("\n");
+		std::vector<vec3>* workingMem = nullptr;
+		{
+			std::unique_lock<std::mutex> lock(availableMems_mutex);
+			if (availableMems.size() == 0)
+			{
+				availableMems_cv.wait(lock, [this] { return availableMems.size() > 0; });
+			}
+			workingMem = availableMems.back();
+			availableMems.pop_back();
+			lock.unlock();
+		}
+
+		auto workingMemItr = workingMem->begin();
+
+		for (auto j = 0; j < height_; j++)
+		{
+			float v = 1.0f - (float(j) + fastrandF()) / height_;
+
+			for (auto i = 0; i < width_; i++)
+			{
+				float u = (float(i) + fastrandF()) / width_;
+
+				ray r = cam.get_ray(u, v);
+				*workingMemItr = sqrt(color(r, *world, 0));
+				workingMemItr++;
+			}
+		}
+
+		{
+			std::lock_guard<std::mutex> lock(filledMems_mutex);
+			filledMems.push_back(workingMem);
+		}
+		filledMems_cv.notify_one();
+	}
+}
+
+void raytracer::accumulate(U8* output, std::vector<vec3>& filledMem)
+{
+	num_iterations_++;
+	SDL_Log("Iteration %d", num_iterations_);
+	auto writePtr = output;
+
+	assert(filledMem.size() == colorAccumulator.size());
+
+	for (int i = 0; i < filledMem.size(); ++i)
+	{
+		auto& accumulator_elem = colorAccumulator[i];
+		auto& in_elem = filledMem[i];
+
+		accumulator_elem += in_elem;
+		vec3 col = accumulator_elem / vec3(num_iterations_);
+		*(writePtr++) = U8(255.99 * col.r);
+		*(writePtr++) = U8(255.99 * col.g);
+		*(writePtr++) = U8(255.99 * col.b);
+		*(writePtr++) = 255;
+	}
 }

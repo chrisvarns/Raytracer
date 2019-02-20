@@ -27,11 +27,17 @@ int main(int argc, char* argv[]) {
 	U8* output = (U8*)malloc(width * height * 4);
 	memset(output, 0, width*height * 4);
 
+	raytracer::startParams params;
+	params.output = output;
+	params.renderer = renderer;
+	params.texture = texture;
+	auto main_thread = _raytracer.start(params);
+
 	bool quit = false;
 	SDL_Event event;
 	while (!quit)
 	{
-		if (SDL_PollEvent(&event))
+		if (SDL_WaitEvent(&event))
 		{
 			switch (event.type) {
 			case SDL_QUIT:
@@ -39,13 +45,9 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 		}
-
-		_raytracer.drawFrame(output);
-
-		SDL_UpdateTexture(texture, NULL, output, width * 4);
-		SDL_RenderCopy(renderer, texture, NULL, NULL);
-		SDL_RenderPresent(renderer);
 	}
+	_raytracer.stop();
+	main_thread.wait();
 
 	stbi_write_png("output.png", width, height, 4, output, 0);
 	free(output);
