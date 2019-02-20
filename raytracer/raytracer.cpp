@@ -129,7 +129,7 @@ vec3 color(const ray& r, hitable& world, int depth) {
         ray scattered;
         vec3 attenuation;
 		vec3 emitted = rec.mat->emitted(rec.u, rec.v, rec.p);
-        if(depth < 50 && rec.mat->scatter(r, rec, attenuation, scattered)) {
+        if(depth < raytracer::max_depth && rec.mat->scatter(r, rec, attenuation, scattered)) {
             return emitted + attenuation*color(scattered, world, depth+1);
         }
         else {

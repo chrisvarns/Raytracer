@@ -15,6 +15,7 @@ class SDL_Texture;
 
 struct raytracer {
     static const int numThreads = 4;
+	static const int max_depth = 50;
 
     raytracer();
 
