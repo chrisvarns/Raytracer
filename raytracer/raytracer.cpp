@@ -219,16 +219,15 @@ void raytracer::mainthread()
 	}
 
 	// Kick off the workers
-	std::vector<std::future<void>> threads;
+	std::vector<std::future<void>> workers;
 	for (int i = 0; i < numThreads; ++i)
 	{
-		threads.push_back(std::async(std::launch::async, [this]() -> void
+		workers.push_back(std::async(std::launch::async, [this]() -> void
 		{
 			this->workerthread();
 		}));
 	}
 
-	std::vector<std::future<void>> workers;
 	while (!stopRequested)
 	{
 		// Wait for work to be completed by workers
