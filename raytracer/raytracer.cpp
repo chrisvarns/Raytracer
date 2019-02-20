@@ -256,11 +256,11 @@ void raytracer::mainthread()
 	for (auto& worker : workers)
 	{
 		worker.wait();
-	}
-
-	for (auto& filledMem : filledMems)
-	{
-		accumulate(params_.output, *filledMem);
+		std::lock_guard<std::mutex> lock(filledMems_mutex);
+		for (auto& filledMem : filledMems)
+		{
+			accumulate(params_.output, *filledMem);
+		}
 	}
 }
 
