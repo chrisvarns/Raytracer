@@ -255,7 +255,11 @@ void raytracer::mainthread()
 
 	for (auto& worker : workers)
 	{
-		worker.wait();
+		using namespace std::chrono_literals;
+		while (worker.wait_for(10ms) == std::future_status::timeout)
+		{
+			availableMems_cv.notify_all(); // some threads can end up waiting indefinitely for availableMems
+		}
 		std::lock_guard<std::mutex> lock(filledMems_mutex);
 		for (auto& filledMem : filledMems)
 		{
@@ -273,8 +277,13 @@ void raytracer::workerthread()
 			std::unique_lock<std::mutex> lock(availableMems_mutex);
 			if (availableMems.size() == 0)
 			{
-				availableMems_cv.wait(lock, [this] { return availableMems.size() > 0; });
+				availableMems_cv.wait(lock);
 			}
+			if (availableMems.size() == 0)
+			{
+				continue;
+			}
+
 			workingMem = availableMems.back();
 			availableMems.pop_back();
 			lock.unlock();

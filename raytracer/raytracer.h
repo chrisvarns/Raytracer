@@ -63,5 +63,5 @@ private:
 	std::mutex filledMems_mutex;
 	std::condition_variable filledMems_cv;
 	
-	bool stopRequested = false;
+	std::atomic_bool stopRequested = false;
 };
