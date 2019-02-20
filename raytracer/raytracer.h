@@ -17,7 +17,7 @@ struct raytracer {
     static const int numThreads = 4;
 	static const int max_depth = 50;
 
-    raytracer();
+	raytracer();
 
 	void setSize(int width, int height);
 	void setupScene();
@@ -65,4 +65,12 @@ private:
 	std::condition_variable filledMems_cv;
 	
 	std::atomic_bool stopRequested = false;
+
+	/* Scenes */
+	hitable_list cornell_box();
+	hitable_list simple_light_scene();
+	hitable_list globe_scene();
+	hitable_list two_perlin_spheres();
+	hitable_list basic_scene();
+	hitable_list random_scene();
 };

@@ -22,8 +22,10 @@
 #include "shapes/rects/yz_rect.h"
 #include "flip_normals.h"
 
-hitable_list cornell_box()
+hitable_list raytracer::cornell_box()
 {
+	set_camera_cornellbox();
+
 	hitable_list list;
 	list.hitables.reserve(6);
 
@@ -42,8 +44,10 @@ hitable_list cornell_box()
 	return list;
 }
 
-hitable_list simple_light_scene()
+hitable_list raytracer::simple_light_scene()
 {
+	set_camera_spheres();
+
 	texture* pertext = new noise_texture(4);
 	hitable_list list;
 	list.hitables.reserve(4);
@@ -54,8 +58,10 @@ hitable_list simple_light_scene()
 	return list;
 }
 
-hitable_list globe_scene()
+hitable_list raytracer::globe_scene()
 {	
+	set_camera_spheres();
+
 	hitable_list list;
 	list.hitables.reserve(1);
 	int nx, ny, nn;
@@ -64,8 +70,10 @@ hitable_list globe_scene()
 	return list;
 }
 
-hitable_list two_perlin_spheres() {
-    material* lambert = new lambertian(new noise_texture(4));
+hitable_list raytracer::two_perlin_spheres() {
+	set_camera_spheres();
+
+	material* lambert = new lambertian(new noise_texture(4));
     hitable_list list;
     list.hitables.reserve(2);
     list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, lambert));
@@ -73,7 +81,9 @@ hitable_list two_perlin_spheres() {
     return list;
 }
 
-hitable_list basic_scene() {
+hitable_list raytracer::basic_scene() {
+	set_camera_spheres();
+
     hitable_list list;
     list.hitables.reserve(1000);
     list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(new checker_texture(new constant_texture(vec3(0.2, 0.3, 0.1)), new constant_texture(vec3(0.9, 0.9, 0.9))))));
@@ -84,7 +94,9 @@ hitable_list basic_scene() {
     return list;
 }
 
-hitable_list random_scene() {
+hitable_list raytracer::random_scene() {
+	set_camera_spheres();
+
     hitable_list list;
     list.hitables.reserve(1000);
     list.hitables.push_back(new sphere(vec3(0,-1000,0), 1000, new lambertian(new checker_texture(new constant_texture(vec3(0.2, 0.3, 0.1)), new constant_texture(vec3(0.9, 0.9, 0.9))))));
@@ -202,9 +214,6 @@ void raytracer::setSize(int width, int height) {
     colorAccumulator.resize(width * height);
 
     num_iterations_ = 0;
-
-	set_camera_spheres();
-	//set_camera_cornellbox();
 }
 
 void raytracer::mainthread()
