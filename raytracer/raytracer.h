@@ -54,6 +54,7 @@ private:
     hitable_list list;
     bvh_node bvh;
 	hitable* world;
+	bool useBvh = true;
 
 	startParams params_;
 

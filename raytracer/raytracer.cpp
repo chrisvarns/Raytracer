@@ -44,6 +44,7 @@ hitable_list raytracer::cornell_box()
 {
 	set_camera_cornellbox();
 	getEnvColor = env_color_black;
+	useBvh = false;
 
 	hitable_list list;
 	list.hitables.reserve(8);
@@ -69,6 +70,7 @@ hitable_list raytracer::simple_light_scene()
 {
 	set_camera_spheres();
 	getEnvColor = env_color_black;
+	useBvh = false;
 
 	texture* pertext = new noise_texture(4);
 	hitable_list list;
@@ -84,6 +86,7 @@ hitable_list raytracer::globe_scene()
 {	
 	set_camera_spheres();
 	getEnvColor = env_color_lavender;
+	useBvh = false;
 
 	hitable_list list;
 	list.hitables.reserve(1);
@@ -96,6 +99,7 @@ hitable_list raytracer::globe_scene()
 hitable_list raytracer::two_perlin_spheres() {
 	set_camera_spheres();
 	getEnvColor = env_color_lavender;
+	useBvh = false;
 
 	material* lambert = new lambertian(new noise_texture(4));
     hitable_list list;
@@ -108,6 +112,7 @@ hitable_list raytracer::two_perlin_spheres() {
 hitable_list raytracer::basic_scene() {
 	set_camera_spheres();
 	getEnvColor = env_color_lavender;
+	useBvh = false;
 
     hitable_list list;
     list.hitables.reserve(1000);
@@ -188,8 +193,12 @@ void raytracer::setupScene()
 	//list = globe_scene();
 	//list = simple_light_scene();
 	//list = cornell_box();
-	bvh = convertListToBvh(list, cam.time0, cam.time1);
-	world = &bvh;
+	world = &list;
+	if (useBvh)
+	{
+		bvh = convertListToBvh(list, cam.time0, cam.time1);
+		world = &bvh;
+	}
 }
 
 std::future<void> raytracer::start(startParams params)
