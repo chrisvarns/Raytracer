@@ -52,7 +52,7 @@ hitable_list raytracer::cornell_box()
 	material* red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
 	material* white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
 	material* green = new lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
-	material* light = new diffuse_light(new constant_texture(vec3(25, 25, 25)));
+	material* light = new diffuse_light(new constant_texture(vec3(15, 15, 15)));
 
 	list.hitables.push_back(new flip_normals(new yz_rect(0, 555, 0, 555, 555, green)));
 	list.hitables.push_back(new yz_rect(0, 555, 0, 555, 0, red));
