@@ -309,6 +309,10 @@ void raytracer::mainthread()
 void raytracer::workerthread()
 {
 	SDL_SetThreadPriority(SDL_THREAD_PRIORITY_LOW);
+
+	auto now = std::chrono::high_resolution_clock::now();
+	fastrand_seed(now.time_since_epoch().count());
+
 	while (!stopRequested)
 	{
 		std::vector<vec3>* workingMem = nullptr;
