@@ -14,7 +14,6 @@ class SDL_Renderer;
 class SDL_Texture;
 
 struct raytracer {
-    static const int numThreads = 4;
 	static const int max_depth = 50;
 
 	raytracer();
@@ -49,6 +48,8 @@ private:
 
     int width_ = -1;
     int height_ = -1;
+
+	int numThreads = std::thread::hardware_concurrency();
 
     hitable_list list;
     bvh_node bvh;
