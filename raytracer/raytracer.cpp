@@ -1,5 +1,6 @@
 #include <chrono>
 
+#include "glm/exponential.hpp"
 #include "glm/gtc/random.hpp"
 #include "SDL.h"
 #include "SDL_log.h"
@@ -22,9 +23,26 @@
 #include "shapes/rects/yz_rect.h"
 #include "flip_normals.h"
 
+typedef vec3(*envColorFunc)(vec3 dir);
+envColorFunc getEnvColor = nullptr;
+
+vec3 env_color_black(vec3)
+{
+	return vec3(0);
+}
+
+vec3 env_color_lavender(vec3 dir)
+{
+	static const vec3 blue = glm::pow(vec3(186.f / 255, 205.f / 255, 247.f / 255), vec3(2));
+	static const vec3 red = glm::pow(vec3(220.f / 255, 205.f / 255, 226.f / 255), vec3(2));
+	float t = 0.5 * (dir.x + 1);
+	return (1 - t)*blue + t * red;
+}
+
 hitable_list raytracer::cornell_box()
 {
 	set_camera_cornellbox();
+	getEnvColor = env_color_black;
 
 	hitable_list list;
 	list.hitables.reserve(6);
@@ -47,6 +65,7 @@ hitable_list raytracer::cornell_box()
 hitable_list raytracer::simple_light_scene()
 {
 	set_camera_spheres();
+	getEnvColor = env_color_black;
 
 	texture* pertext = new noise_texture(4);
 	hitable_list list;
@@ -61,6 +80,7 @@ hitable_list raytracer::simple_light_scene()
 hitable_list raytracer::globe_scene()
 {	
 	set_camera_spheres();
+	getEnvColor = env_color_lavender;
 
 	hitable_list list;
 	list.hitables.reserve(1);
@@ -72,6 +92,7 @@ hitable_list raytracer::globe_scene()
 
 hitable_list raytracer::two_perlin_spheres() {
 	set_camera_spheres();
+	getEnvColor = env_color_lavender;
 
 	material* lambert = new lambertian(new noise_texture(4));
     hitable_list list;
@@ -83,6 +104,7 @@ hitable_list raytracer::two_perlin_spheres() {
 
 hitable_list raytracer::basic_scene() {
 	set_camera_spheres();
+	getEnvColor = env_color_lavender;
 
     hitable_list list;
     list.hitables.reserve(1000);
@@ -96,6 +118,7 @@ hitable_list raytracer::basic_scene() {
 
 hitable_list raytracer::random_scene() {
 	set_camera_spheres();
+	getEnvColor = env_color_lavender;
 
     hitable_list list;
     list.hitables.reserve(1000);
@@ -132,9 +155,6 @@ bvh_node convertListToBvh(const hitable_list& list, float time0, float time1) {
     return bvh_node(const_cast<const hitable**>(list.hitables.data()), int(list.hitables.size()), time0, time1);
 }
 
-vec3 blue(float(186) / float(255), float(205) / float(255), float(247) / float(255));
-vec3 red(float(220) / float(255), float(205) / float(255), float(226) / float(255));
-
 vec3 color(const ray& r, hitable& world, int depth) {
     hit_record rec;
     if(world.hit(r, 0.001, FLT_MAX, rec)) {
@@ -149,16 +169,13 @@ vec3 color(const ray& r, hitable& world, int depth) {
         }
     }
     else {
-		//return vec3();
 		vec3 unit_direction = normalize(r.direction());
-		float t = 0.5 * (unit_direction.x + 1);
-		return (1-t)*blue + t*red;
+		return getEnvColor(unit_direction);
     }
 }
 
-raytracer::raytracer() {
-    blue = blue * blue;
-    red = red * red;
+raytracer::raytracer()
+{
 }
 
 void raytracer::setupScene()
