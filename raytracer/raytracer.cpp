@@ -60,7 +60,7 @@ hitable_list raytracer::cornell_box()
 	list.hitables.push_back(new xz_rect(0, 555, 0, 555, 0, white));
 	list.hitables.push_back(new flip_normals(new xy_rect(0, 555, 0, 555, 555, white)));
 	list.hitables.push_back(new box(vec3(130, 0, 65), vec3(295, 165, 230), white));
-	list.hitables.push_back(new box(vec3(265, 0, 295), vec3(430, 330, 360), white));
+	list.hitables.push_back(new box(vec3(265, 0, 295), vec3(430, 330, 460), white));
 
 	return list;
 }
