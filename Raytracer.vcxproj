@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="raytracer\shapes\box.cpp" />
     <ClCompile Include="raytracer\flip_normals.cpp" />
     <ClCompile Include="raytracer\shapes\rects\xy_rect.cpp" />
     <ClCompile Include="raytracer\stb_image.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="raytracer\shapes\rects\yz_rect.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="raytracer\shapes\box.h" />
     <ClInclude Include="raytracer\flip_normals.h" />
     <ClInclude Include="raytracer\materials\diffuse_light.h" />
     <ClInclude Include="raytracer\shapes\rects\xy_rect.h" />

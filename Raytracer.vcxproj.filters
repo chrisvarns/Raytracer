@@ -84,6 +84,9 @@
     <ClCompile Include="raytracer\flip_normals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="raytracer\shapes\box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="raytracer\aabb.h">
@@ -162,6 +165,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="raytracer\flip_normals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="raytracer\shapes\box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

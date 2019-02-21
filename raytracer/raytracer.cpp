@@ -16,6 +16,7 @@
 #include "textures/constant_texture.h"
 #include "textures/noise_texture.h"
 #include "textures/image_texture.h"
+#include "shapes/box.h"
 #include "shapes/movingsphere.h"
 #include "shapes/sphere.h"
 #include "shapes/rects/xy_rect.h"
@@ -45,7 +46,7 @@ hitable_list raytracer::cornell_box()
 	getEnvColor = env_color_black;
 
 	hitable_list list;
-	list.hitables.reserve(6);
+	list.hitables.reserve(8);
 
 	material* red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
 	material* white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
@@ -58,6 +59,8 @@ hitable_list raytracer::cornell_box()
 	list.hitables.push_back(new flip_normals(new xz_rect(0, 555, 0, 555, 555, white)));
 	list.hitables.push_back(new xz_rect(0, 555, 0, 555, 0, white));
 	list.hitables.push_back(new flip_normals(new xy_rect(0, 555, 0, 555, 555, white)));
+	list.hitables.push_back(new box(vec3(130, 0, 65), vec3(295, 165, 230), white));
+	list.hitables.push_back(new box(vec3(265, 0, 295), vec3(430, 330, 360), white));
 
 	return list;
 }
