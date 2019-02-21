@@ -339,7 +339,7 @@ void raytracer::workerthread()
 				float u = (float(i) + fastrandF()) / width_;
 
 				ray r = cam.get_ray(u, v);
-				*workingMemItr = sqrt(color(r, *world, 0));
+				*workingMemItr = color(r, *world, 0);
 				workingMemItr++;
 			}
 		}
@@ -367,9 +367,9 @@ void raytracer::accumulate(U8* output, std::vector<vec3>& filledMem)
 
 		accumulator_elem += in_elem;
 		vec3 col = accumulator_elem / vec3(num_iterations_);
-		*(writePtr++) = U8(255.99 * col.r);
-		*(writePtr++) = U8(255.99 * col.g);
-		*(writePtr++) = U8(255.99 * col.b);
+		*(writePtr++) = U8(255.99 * sqrt(col.r));
+		*(writePtr++) = U8(255.99 * sqrt(col.g));
+		*(writePtr++) = U8(255.99 * sqrt(col.b));
 		*(writePtr++) = 255;
 	}
 }
