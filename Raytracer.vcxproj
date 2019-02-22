@@ -154,6 +154,8 @@
     <ClCompile Include="raytracer\textures\checker_texture.cpp" />
     <ClCompile Include="raytracer\shapes\rects\xz_rect.cpp" />
     <ClCompile Include="raytracer\shapes\rects\yz_rect.cpp" />
+    <ClCompile Include="raytracer\transformations\translate.cpp" />
+    <ClCompile Include="raytracer\transformations\rotate_y.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="raytracer\shapes\box.h" />
@@ -183,6 +185,8 @@
     <ClInclude Include="raytracer\types.h" />
     <ClInclude Include="raytracer\shapes\rects\xz_rect.h" />
     <ClInclude Include="raytracer\shapes\rects\yz_rect.h" />
+    <ClInclude Include="raytracer\transformations\translate.h" />
+    <ClInclude Include="raytracer\transformations\rotate_y.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="targets\CopyDLLs.targets">

@@ -23,6 +23,8 @@
 #include "shapes/rects/xz_rect.h"
 #include "shapes/rects/yz_rect.h"
 #include "flip_normals.h"
+#include "transformations/rotate_y.h"
+#include "transformations/translate.h"
 
 typedef vec3(*envColorFunc)(vec3 dir);
 envColorFunc getEnvColor = nullptr;
@@ -60,8 +62,8 @@ hitable_list raytracer::cornell_box()
 	list.hitables.push_back(new flip_normals(new xz_rect(0, 555, 0, 555, 555, white)));
 	list.hitables.push_back(new xz_rect(0, 555, 0, 555, 0, white));
 	list.hitables.push_back(new flip_normals(new xy_rect(0, 555, 0, 555, 555, white)));
-	list.hitables.push_back(new box(vec3(130, 0, 65), vec3(295, 165, 230), white));
-	list.hitables.push_back(new box(vec3(265, 0, 295), vec3(430, 330, 460), white));
+	list.hitables.push_back(new translate(new rotate_y(new box(vec3(0), vec3(165), white), -18), vec3(130, 0, 65)));
+	list.hitables.push_back(new translate(new rotate_y(new box(vec3(0), vec3(165, 330, 165), white), 15), vec3(265, 0, 295)));
 
 	return list;
 }
